@@ -22,13 +22,14 @@ export interface HeaderConfig {
   secretAccessKey: string // wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
   region: string // us-west-2
+  host:string // dynamodb.us-west-2.amazonaws.com
 
   canonicalUri?: string // fx /path/to/somewhere
   // canonicalQuerystring?: string // will probly leak stuff
 
       method: string // POST
         op: string // CreateTable
-            payload?: Uint8Array
+            payload: Uint8Array
   date?:Date // allows reusing a date for 5min (max signature timestamp diff)
 }
 
@@ -38,9 +39,9 @@ export function createHeaders(conf: HeaderConfig): Headers {
     throw new TypeError("unsupported http method")
   }
   
-  const isPOST: boolean = conf.method === "post" || conf.method === "POST"
-  
-  const host: string = conf.region === "local" ? "localhost" : `dynamodb.${conf.region}.amazonaws.com`
+  // const isPOST: boolean = conf.method === "post" || conf.method === "POST"
+    
+  // const host: string = conf.region === "local" ? "localhost" : `dynamodb.${conf.region}.amazonaws.com`
   const amzTarget: string = `DynamoDB_20120810.${conf.op}`
   // const endpoint: string = `http${host === "localhost" ? "" : "s"}://${host}`;
   
@@ -52,9 +53,9 @@ export function createHeaders(conf: HeaderConfig): Headers {
   
   const canonicalHeaders: string = 
   // 'content-type:' + content_type + '\n' + 'host:' + host + '\n' + 'x-amz-date:' + amz_date + '\n' + 'x-amz-target:' + amz_target + '\n'
-  `${isPOST ? `content-type:${POST_CONTENT_TYPE}\n` : ""}host:${host}\nx-amz-date:${amzDate}\nx-amz-target:${amzTarget}\n`
+  /*`${isPOST ? `content-type:${POST_CONTENT_TYPE}\n` : ""}*/ `content-type:${POST_CONTENT_TYPE}\nhost:${conf.host}\nx-amz-date:${amzDate}\nx-amz-target:${amzTarget}\n`
   
-  const signedHeaders: string = isPOST ? 'content-type;host;x-amz-date;x-amz-target' : 'host;x-amz-date;x-amz-target' 
+  const signedHeaders: string =/* isPOST ?*/ 'content-type;host;x-amz-date;x-amz-target' //: 'host;x-amz-date;x-amz-target' 
   
   // TODO: what happens in case of GET set payload to an empty buf?
   const payloadHash: string = sha256(conf.payload, null, "hex") 
@@ -80,13 +81,14 @@ export function createHeaders(conf: HeaderConfig): Headers {
   const authorizationHeader: string = `${ALGORITHM} Credential=${conf.accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`
   
   const headers: Headers =new Headers({
+    "Content-Type": POST_CONTENT_TYPE,
              'X-Amz-Date':amzDate,
              'X-Amz-Target':amzTarget,
              'Authorization':authorizationHeader})
              
-             if (isPOST) {
-               headers.set("Content-Type", POST_CONTENT_TYPE) 
-             }
+             // if (isPOST) {
+             //   headers.set("Content-Type", POST_CONTENT_TYPE) 
+             // }
   
 return headers
 }
