@@ -13,25 +13,35 @@ def getSignatureKey(key, date_stamp, regionName, serviceName):
 */
 
 import { encode, decode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
-
 import { hmac } from "https://denopkg.com/chiefbiiko/hmac/mod.ts";
+import { DATE_STAMP_REGEX, formatDateStamp } from "./dates.ts"
 
+/** Some magic bytes. */
 const AWS4: Uint8Array = encode("AWS4", "utf8");
 
-export function awsv4sign(key: string | Uint8Array, date: Date | string, region:string, service:string, keyInputEncoding?:string, outputEncoding?:string): string | Uint8Array {
+// /** Amazon date regex. */
+// const AMZ_DATE_REGEX:RegExp = /^\d{8}T\d{6}Z$/
+// 
+// /** Datestamp regex. */
+// const DATE_STAMP_REGEX:RegExp = /^\d{8}$/
+
+/** Creates a key for generating an aws signature version 4. */
+export function awsv4kdf(key: string | Uint8Array, dateStamp: Date | string, region:string, service:string, keyInputEncoding?:string, outputEncoding?:string): string | Uint8Array {
   if (typeof key === "string") {
     key = encode(key, keyInputEncoding) as Uint8Array;
   }
   
-  if (typeof date !== "string") {
-    date = date.toISOString();
+  if (typeof dateStamp !== "string") {
+    dateStamp = formatDateStamp(dateStamp)
+  } else if (!DATE_STAMP_REGEX.test(dateStamp)) {
+    throw new TypeError("date stamp format must be yyyy.mm.dd")
   }
   
   const paddedKey: Uint8Array = new Uint8Array(4 + key.byteLength);
   paddedKey.set(AWS4, 0);
   paddedKey.set(key, 4);
   
-  let mac: Uint8Array = hmac("sha256", paddedKey, date, "utf8")
+  let mac: Uint8Array = hmac("sha256", paddedKey, dateStamp, "utf8")
   mac = hmac("sha256", mac, region, "utf8")
   mac = hmac("sha256", mac, service, "utf8")
     mac = hmac("sha256", mac, "aws4_request", "utf8")
