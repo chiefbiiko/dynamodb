@@ -19,9 +19,11 @@ export interface ClientConfig {
 export function createClient(conf: ClientConfig): DynamoDBClient {
   return {
     async put(key: any, value: any): Promise<any> {
+      const payload: Uint8Array = createPayload(/** make params to json string */)
       const headers: Headers = createHeaders({ ...conf, method: "PUT", op: "PutItem", 
-    payload: .createPayload(/** make params to json string */)
+    payload
     })
+    // fetch send request
     },
     async get() {
       

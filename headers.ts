@@ -39,32 +39,46 @@ export function createHeaders(conf: HeaderConfig): Headers {
   }
   
   const isPOST: boolean = conf.method === "post" || conf.method === "POST"
+  
   const host: string = conf.region === "local" ? "localhost" : `dynamodb.${conf.region}.amazonaws.com`
   const amzTarget: string = `DynamoDB_20120810.${conf.op}`
   // const endpoint: string = `http${host === "localhost" ? "" : "s"}://${host}`;
+  
   const date: Date = conf.date || new Date()
   const amzDate: string = formatAmzDate(date)
   const dateStamp: string = formatDateStamp(date)
+  
   const canonicalUri: string = conf.canonicalUri ||"/"
+  
   const canonicalHeaders: string = 
   // 'content-type:' + content_type + '\n' + 'host:' + host + '\n' + 'x-amz-date:' + amz_date + '\n' + 'x-amz-target:' + amz_target + '\n'
   `${isPOST ? `content-type:${POST_CONTENT_TYPE}\n` : ""}host:${host}\nx-amz-date:${amzDate}\nx-amz-target:${amzTarget}\n`
+  
   const signedHeaders: string = isPOST ? 'content-type;host;x-amz-date;x-amz-target' : 'host;x-amz-date;x-amz-target' 
+  
   // TODO: what happens in case of GET set payload to an empty buf?
   const payloadHash: string = sha256(conf.payload, null, "hex") 
+  
   const canonicalRequest: string = 
    // method + '\n' + canonical_uri + '\n' + canonical_querystring + '\n' + canonical_headers + '\n' + signed_headers + '\n' + payload_hash
    `${conf.method.trim().toUpperCase()}\n${canonicalUri}\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`
+  
     const canonicalRequestDigest: string = sha256(canonicalRequest, "utf8", "hex")
+  
   const credentialScope : string = 
   // date_stamp + '/' + region + '/' + service + '/' + 'aws4_request'
   `${dateStamp}/${conf.region}/${SERVICE}/aws4_request`
+  
   const msg: string = 
    // algorithm + '\n' +  amz_date + '\n' +  credential_scope + '\n' +  hashlib.sha256(canonical_request.encode('utf-8')).hexdigest()
    encode(`${ALGORITHM}\n${amzDate}\n${credentialScope}\n${canonicalRequestDigest}`, "utf8" )
+  
   const key: Uint8Array = awsv4kdf(conf.secretAccessKey, dateStamp, conf.region, SERVICE)
+  
   const signature: string = hmac("sha256", key, msg, null, "hex")
+  
   const authorizationHeader: string = `${ALGORITHM} Credential=${conf.accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`
+  
   const headers: Headers =new Headers({
              'X-Amz-Date':amzDate,
              'X-Amz-Target':amzTarget,
