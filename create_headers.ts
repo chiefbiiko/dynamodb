@@ -2,6 +2,7 @@ import { sha256 } from "https://denopkg.com/chiefbiiko/sha256/mod.ts";
 import {hmac} from "https://denopkg.com/chiefbiiko/hmac/mod.ts"
 import {awsv4SignatureKDF} from "./awsv4signature_kdf.ts"
 import { formatAmzDate, formatDateStamp } from "./format_date.ts"
+import { ClientConfig} from "./create_client.ts"
 import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
 /** Service name. */
   const SERVICE: string = "dynamodb"
@@ -13,15 +14,8 @@ const ALGORITHM:string = 'AWS4-HMAC-SHA256'
 const POST_CONTENT_TYPE: string =  'application/x-amz-json-1.0'
 
 /** Required configuration for assembling headers. */
-export interface HeaderConfig {
-
-  accessKeyId: string // AKIAIOSFODNN7EXAMPLE
-  secretAccessKey: string // wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-
-  region: string // us-west-2
-  host:string // dynamodb.us-west-2.amazonaws.com
-
-  canonicalUri?: string // fx /path/to/somewhere
+export interface HeadersConfig extends ClientConfig {
+    host:string // dynamodb.us-west-2.amazonaws.com
   // canonicalQuerystring?: string // will probly leak stuff
 
       method: string // POST
@@ -31,7 +25,7 @@ export interface HeaderConfig {
 }
 
 /** Assembles a header object for a DynamoDB request. */
-export function createHeaders(conf: HeaderConfig): Headers {
+export function createHeaders(conf: HeadersConfig): Headers {
   // const isPOST: boolean = conf.method === "post" || conf.method === "POST"
     
   // const host: string = conf.region === "local" ? "localhost" : `dynamodb.${conf.region}.amazonaws.com`
@@ -50,26 +44,25 @@ export function createHeaders(conf: HeaderConfig): Headers {
   
   const signedHeaders: string =/* isPOST ?*/ 'content-type;host;x-amz-date;x-amz-target' //: 'host;x-amz-date;x-amz-target' 
   
-  // TODO: what happens in case of GET set payload to an empty buf?
-  const payloadHash: string = sha256(conf.payload, null, "hex") 
+  const payloadHash: string = sha256(conf.payload, null, "hex") as string
   
   const canonicalRequest: string = 
    // method + '\n' + canonical_uri + '\n' + canonical_querystring + '\n' + canonical_headers + '\n' + signed_headers + '\n' + payload_hash
    `${conf.method.trim().toUpperCase()}\n${canonicalUri}\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`
   
-    const canonicalRequestDigest: string = sha256(canonicalRequest, "utf8", "hex")
+    const canonicalRequestDigest: string = sha256(canonicalRequest, "utf8", "hex") as string
   
   const credentialScope : string = 
   // date_stamp + '/' + region + '/' + service + '/' + 'aws4_request'
   `${dateStamp}/${conf.region}/${SERVICE}/aws4_request`
   
-  const msg: string = 
+  const msg: Uint8Array = 
    // algorithm + '\n' +  amz_date + '\n' +  credential_scope + '\n' +  hashlib.sha256(canonical_request.encode('utf-8')).hexdigest()
    encode(`${ALGORITHM}\n${amzDate}\n${credentialScope}\n${canonicalRequestDigest}`, "utf8" )
   
-  const key: Uint8Array = awsv4SignatureKDF(conf.secretAccessKey, dateStamp, conf.region, SERVICE)
+  const key: Uint8Array = awsv4SignatureKDF(conf.secretAccessKey, dateStamp, conf.region, SERVICE) as Uint8Array
   
-  const signature: string = hmac("sha256", key, msg, null, "hex")
+  const signature: string = hmac("sha256", key, msg, null, "hex") as string
   
   const authorizationHeader: string = `${ALGORITHM} Credential=${conf.accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`
   

@@ -1,5 +1,5 @@
 import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
-import { createHeaders} from "./create_headers.ts"
+import { HeadersConfig, createHeaders} from "./create_headers.ts"
 
 /** Generic document. */
 export interface Document {
@@ -11,12 +11,13 @@ export interface DynamoDBClient {
   [key:string]: (doc: Document)=> Promise<Document>
 }
 
-/** Client configuration- */
+/** Client configuration. */
 export interface ClientConfig {
   accessKeyId: string // AKIAIOSFODNN7EXAMPLE
   secretAccessKey: string // wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
   region: string // us-west-2
   canonicalUri?: string // fx /path/to/somewhere
+  port?: number // 8000
 }
 
 const OPS: Set<string> = new Set(["BatchGetItem",
@@ -36,17 +37,21 @@ async function baseOp (conf: Document, op: string, doc: Document): Promise< Docu
   const method: string = "POST"
   
   const payload: Uint8Array = encode(JSON.stringify(doc), "utf8")
-  const headers: Headers = createHeaders({ ...conf, op, method,  payload })
+  const headers: Headers = createHeaders({ ...conf, op, method,  payload } as HeadersConfig)
 
-const response: Response =  await fetch(conf.endpoint, {method,  headers,body: payload})
+const response: Response = await fetch(conf.endpoint, {method,  headers,body: payload})
 
 return response.json()
 }
 
 /** Creates a DynamoDB client. */
 export function createClient(conf: ClientConfig): DynamoDBClient {
+  if (!conf.accessKeyId || !conf.secretAccessKey || !conf.region) {
+    throw new TypeError("client config must include accessKeyId, secretAccessKey and region")
+  }
+  
      const host: string = conf.region === "local" ? "localhost" : `dynamodb.${conf.region}.amazonaws.com`
-     const endpoint: string = `http${conf.region === "local" ? "" : "s"}://${host}`
+     const endpoint: string = `http${conf.region === "local" ? "" : "s"}://${host}:${conf.port ||8000}/`
      const _conf: Document = { ...conf, host, endpoint}
      
   const ddbc: DynamoDBClient = {};

@@ -14,7 +14,7 @@ def getSignatureKey(key, date_stamp, regionName, serviceName):
 
 import { encode, decode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
 import { hmac } from "https://denopkg.com/chiefbiiko/hmac/mod.ts";
-import { DATE_STAMP_REGEX, formatDateStamp } from "./dates.ts"
+import { DATE_STAMP_REGEX, formatDateStamp } from "./format_date.ts"
 
 /** Some magic bytes. */
 const AWS4: Uint8Array = encode("AWS4", "utf8");
@@ -41,10 +41,10 @@ export function awsv4SignatureKDF(key: string | Uint8Array, dateStamp: Date | st
   paddedKey.set(AWS4, 0);
   paddedKey.set(key, 4);
   
-  let mac: Uint8Array = hmac("sha256", paddedKey, dateStamp, "utf8")
-  mac = hmac("sha256", mac, region, "utf8")
-  mac = hmac("sha256", mac, service, "utf8")
-    mac = hmac("sha256", mac, "aws4_request", "utf8")
+  let mac: Uint8Array = hmac("sha256", paddedKey, dateStamp, "utf8") as Uint8Array
+  mac = hmac("sha256", mac, region, "utf8") as Uint8Array
+  mac = hmac("sha256", mac, service, "utf8") as Uint8Array
+    mac = hmac("sha256", mac, "aws4_request", "utf8") as Uint8Array
     
   return outputEncoding ? decode(mac, outputEncoding): mac;
 }
