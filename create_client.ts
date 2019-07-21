@@ -1,10 +1,6 @@
 import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
 import { HeadersConfig, createHeaders } from "./create_headers.ts";
-
-/** Generic document. */
-export interface Document {
-  [key: string]: any;
-}
+import { Document } from "./types.ts"
 
 /** Generic representation of a DynamoDB client. */
 export interface DynamoDBClient {

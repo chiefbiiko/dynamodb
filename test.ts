@@ -26,21 +26,56 @@ test({
       TableName: "users",
       KeySchema: [{ KeyType: "HASH", AttributeName: "uuid" }],
       AttributeDefinitions: [{ AttributeName: "uuid", AttributeType: "S" }],
-      ProvisionedThroughput: { ReadCapacityUnits: 1,   WriteCapacityUnits: 1}
+      ProvisionedThroughput: { ReadCapacityUnits: 1, WriteCapacityUnits: 1 }
     });
 
     response = await ddbc.putItem({
       TableName: "users",
-      Item: { uuid: {S: "abc"}, role: {S:"admin"} }
+      Item: { uuid: { S: "abc" }, role: { S: "admin" } }
+    });
+
+    assertEquals(response, {});
+
+    response = await ddbc.getItem({
+      TableName: "users",
+      Key: { uuid: { S: "abc" } }
+    });
+
+    assertEquals(response.Item.role.S, "admin");
+
+    response = await ddbc.deleteItem({
+      TableName: "users",
+      Key: { uuid: { S: "abc" } }
+    });
+
+    assertEquals(response, {});
+  }
+});
+
+test({
+  name: "convertable",
+  async fn(): Promise<void> {
+    const ddbc: DynamoDBClient = createClient(CONF);
+
+    let response: Document = await ddbc.createTable({
+      TableName: "users",
+      KeySchema: [{ KeyType: "HASH", AttributeName: "uuid" }],
+      AttributeDefinitions: [{ AttributeName: "uuid", AttributeType: "S" }],
+      ProvisionedThroughput: { ReadCapacityUnits: 1, WriteCapacityUnits: 1 }
+    });
+
+    response = await ddbc.putItem({
+      TableName: "users",
+      Item: { uuid: { S: "abc" }, role: { S: "admin" } }
     });
 
     response = await ddbc.getItem({
       TableName: "users",
-      Key: { uuid: { S: "abc" }}
+      Key: { uuid: { S: "abc" } }
     });
 
     assertEquals(response.Item.role.S, "admin");
   }
 });
 
-runIfMain(import.meta);
+runIfMain(import.meta, { skip: /convertable/ });
