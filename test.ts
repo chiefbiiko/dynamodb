@@ -8,19 +8,44 @@ const conf: ClientConfig = { accessKeyId: ENV.ACCESS_KEY_ID, secretAccessKey: EN
 region: "local"
 }
 
-const ddbc: DynamoDBClient = createClient(conf)
-
 test({
-  name: "create table",
+  name: "table dance",
   async fn(): Promise<void> {
-    const query: Document = { KeySchema: [ { KeyType: 'HASH', AttributeName: 'Id' } ],
+    const ddbc: DynamoDBClient = createClient(conf)
+    
+    const createTableQuery: Document = { KeySchema: [ { KeyType: 'HASH', AttributeName: 'Id' } ],
   TableName: 'TestTable',
   AttributeDefinitions: [ { AttributeName: 'Id', AttributeType: 'S' } ],
   ProvisionedThroughput: { WriteCapacityUnits: 5, ReadCapacityUnits: 5 } };
     
-    const response = await ddbc.createTable(query)
+    let response: Document = await ddbc.createTable(createTableQuery)
     
-    assertEquals(response, {})
+    // assertEquals(response, {})
+    
+    const putItemQuery:Document = {
+      TableName: "TestTable",
+      Item: {
+        testKey: "testValue"
+      }
+    }
+    
+        response = await ddbc.putItem(putItemQuery)
+        
+            // assertEquals(response, {})
+            
+            const getItemQuery:Document = {
+              TableName: "TestTable",
+              Key: {
+                testKey: {
+                  S: "testValue"
+                }
+              },
+              "ReturnConsumedCapacity": "TOTAL"
+            }
+            
+                response = await ddbc.getItem(getItemQuery)
+                console.error(">>>>>>>>>> response", JSON.stringify(response))
+                      assertEquals(response.Item.testKey.S, "testValue")
   }
 })
 
