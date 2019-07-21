@@ -1,5 +1,5 @@
 import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
-import { createHeaders} from "./headers.ts"
+import { createHeaders} from "./create_headers.ts"
 
 /** Generic document. */
 export interface Document {
