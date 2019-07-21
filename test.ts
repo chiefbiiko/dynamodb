@@ -22,38 +22,22 @@ test({
   async fn(): Promise<void> {
     const ddbc: DynamoDBClient = createClient(CONF);
 
-    const createTableQuery: Document = {
+    let response: Document = await ddbc.createTable({
       TableName: "users",
       KeySchema: [{ KeyType: "HASH", AttributeName: "uuid" }],
       AttributeDefinitions: [{ AttributeName: "uuid", AttributeType: "S" }],
-      ProvisionedThroughput: {
-        ReadCapacityUnits: 1,
-        WriteCapacityUnits: 1
-      }
-    };
+      ProvisionedThroughput: { ReadCapacityUnits: 1,   WriteCapacityUnits: 1}
+    });
 
-    let response: Document = await ddbc.createTable(createTableQuery);
-
-    const putItemQuery: Document = {
+    response = await ddbc.putItem({
       TableName: "users",
-      Item: {
-        uuid: "abc",
-        role: "admin"
-      }
-    };
+      Item: { uuid: {S: "abc"}, role: {S:"admin"} }
+    });
 
-    response = await ddbc.putItem(putItemQuery);
-
-    assertEquals(response, {});
-
-    const getItemQuery: Document = {
+    response = await ddbc.getItem({
       TableName: "users",
-      Key: {
-        uuid: { S: "abc" }
-      }
-    };
-
-    response = await ddbc.getItem(getItemQuery);
+      Key: { uuid: { S: "abc" }}
+    });
 
     assertEquals(response.Item.role.S, "admin");
   }
