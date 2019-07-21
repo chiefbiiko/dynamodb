@@ -1,10 +1,11 @@
 import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
 import { HeadersConfig, createHeaders } from "./create_headers.ts";
-import { Document } from "./types.ts"
+import { Converter } from "./converter.ts";
+import { Document } from "./types.ts";
 
 /** Generic representation of a DynamoDB client. */
 export interface DynamoDBClient {
-  [key: string]: (doc: Document) => Promise<Document>;
+  [key: string]: (query: Document, options?: Document) => Promise<Document>;
 }
 
 /** Client configuration. */
@@ -59,11 +60,14 @@ const OPS: Set<string> = new Set([
 async function baseOp(
   conf: Document,
   op: string,
-  doc: Document
+  query: Document,
+  options: Document = {}
 ): Promise<Document> {
-  // const method: string = "POST"
+  if (!options.raw && !options.rawInput) {
+    query = Converter.marshall(query);
+  }
 
-  const payload: Uint8Array = encode(JSON.stringify(doc), "utf8");
+  const payload: Uint8Array = encode(JSON.stringify(query), "utf8");
   const headers: Headers = createHeaders({
     ...conf,
     op,
@@ -71,13 +75,27 @@ async function baseOp(
     payload
   } as HeadersConfig);
 
-  const response: Response = await fetch(conf.endpoint, {
+  const rawResult: Document = await fetch(conf.endpoint, {
     method: conf.method,
     headers,
     body: payload
-  });
+  }).then(
+    (response: Response): Document => {
+      // console.error(">>>>>>> response.status", response.status)
+      // console.error(">>>>>>>>> response.statusText", response.statusText)
+      // if (!response.ok) {
+      //   throw new Error("http query request failed")
+      // }
 
-  return response.json();
+      return response.json();
+    }
+  );
+
+  if (options.raw || options.rawOutput) {
+    return rawResult;
+  }
+
+  return Converter.unmarshall(rawResult);
 }
 
 /** Creates a DynamoDB client. */

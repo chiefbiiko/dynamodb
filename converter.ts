@@ -1,7 +1,7 @@
 // import DynamoDB = require('../../clients/dynamodb');
-import { toUint8Array as base64ToUint8Array} from "https://deno.land/std/base64/mod.ts"
+import { toUint8Array as base64ToUint8Array} from "https://deno.land/x/base64/mod.ts"
 
-import {Document, DynamoDBSet, NumberValue, typeOf} from "./types.ts"
+import {Document, DynamoDBSet, DynamoDBNumberValue, typeOf} from "./types.ts"
 
 /** Formats a list. */
 function formatList(data: any[], options: Document={}): Document {
@@ -16,7 +16,7 @@ function formatList(data: any[], options: Document={}): Document {
 
 /** Converts a number. */
 function convertNumber(value: string, wrapNumbers: boolean = false): any {
-  return wrapNumbers ? new NumberValue(value) : Number(value);
+  return wrapNumbers ? new DynamoDBNumberValue(value) : Number(value);
 }
 
 /** Formats a map. */
@@ -202,7 +202,10 @@ export class Converter {
         data: Document,
         options: Document = {}
     ): any {
-      var list, map, i;
+      let list: any[]
+      let map: Document
+      let i: number;
+      
       for (var type in data) {
         var values = data[type];
         if (type === 'M') {

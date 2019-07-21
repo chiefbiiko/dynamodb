@@ -2,12 +2,9 @@ import { test, runIfMain } from "https://deno.land/std/testing/mod.ts";
 
 import { assert, assertEquals } from "https://deno.land/std/testing/asserts.ts";
 
-import {
-  ClientConfig,
-  Document,
-  DynamoDBClient,
-  createClient
-} from "./create_client.ts";
+import { Document } from "./types.ts";
+
+import { ClientConfig, DynamoDBClient, createClient } from "./create_client.ts";
 
 const ENV: Document = Deno.env();
 
@@ -22,31 +19,43 @@ test({
   async fn(): Promise<void> {
     const ddbc: DynamoDBClient = createClient(CONF);
 
-    let response: Document = await ddbc.createTable({
-      TableName: "users",
-      KeySchema: [{ KeyType: "HASH", AttributeName: "uuid" }],
-      AttributeDefinitions: [{ AttributeName: "uuid", AttributeType: "S" }],
-      ProvisionedThroughput: { ReadCapacityUnits: 1, WriteCapacityUnits: 1 }
-    });
+    let response: Document = await ddbc.createTable(
+      {
+        TableName: "users",
+        KeySchema: [{ KeyType: "HASH", AttributeName: "uuid" }],
+        AttributeDefinitions: [{ AttributeName: "uuid", AttributeType: "S" }],
+        ProvisionedThroughput: { ReadCapacityUnits: 1, WriteCapacityUnits: 1 }
+      },
+      { raw: true }
+    );
 
-    response = await ddbc.putItem({
-      TableName: "users",
-      Item: { uuid: { S: "abc" }, role: { S: "admin" } }
-    });
+    response = await ddbc.putItem(
+      {
+        TableName: "users",
+        Item: { uuid: { S: "abc" }, role: { S: "admin" } }
+      },
+      { raw: true }
+    );
 
     assertEquals(response, {});
 
-    response = await ddbc.getItem({
-      TableName: "users",
-      Key: { uuid: { S: "abc" } }
-    });
+    response = await ddbc.getItem(
+      {
+        TableName: "users",
+        Key: { uuid: { S: "abc" } }
+      },
+      { raw: true }
+    );
 
     assertEquals(response.Item.role.S, "admin");
 
-    response = await ddbc.deleteItem({
-      TableName: "users",
-      Key: { uuid: { S: "abc" } }
-    });
+    response = await ddbc.deleteItem(
+      {
+        TableName: "users",
+        Key: { uuid: { S: "abc" } }
+      },
+      { raw: true }
+    );
 
     assertEquals(response, {});
   }
@@ -57,24 +66,29 @@ test({
   async fn(): Promise<void> {
     const ddbc: DynamoDBClient = createClient(CONF);
 
-    let response: Document = await ddbc.createTable({
-      TableName: "users",
-      KeySchema: [{ KeyType: "HASH", AttributeName: "uuid" }],
-      AttributeDefinitions: [{ AttributeName: "uuid", AttributeType: "S" }],
-      ProvisionedThroughput: { ReadCapacityUnits: 1, WriteCapacityUnits: 1 }
-    });
+    let response: Document = await ddbc.createTable(
+      {
+        TableName: "users",
+        KeySchema: [{ KeyType: "HASH", AttributeName: "uuid" }],
+        AttributeDefinitions: [{ AttributeName: "uuid", AttributeType: "S" }],
+        ProvisionedThroughput: { ReadCapacityUnits: 1, WriteCapacityUnits: 1 }
+      },
+      { raw: true }
+    );
 
     response = await ddbc.putItem({
       TableName: "users",
-      Item: { uuid: { S: "abc" }, role: { S: "admin" } }
+      Item: { uuid: "abc", friends: ["djb", "devil"] }
     });
 
     response = await ddbc.getItem({
       TableName: "users",
-      Key: { uuid: { S: "abc" } }
+      Key: { uuid: "abc" }
     });
 
-    assertEquals(response.Item.role.S, "admin");
+    console.error(">>>>>>> response", JSON.stringify(response));
+
+    assertEquals(response.Item.friends, ["djb", "devil"]);
   }
 });
 

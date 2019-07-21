@@ -4,7 +4,7 @@ export interface Document {
 }
 
 /** aws typeof impl. */
-function typeOf(data: any): string {
+export function typeOf(data: any): string {
   if (data === null && typeof data === 'object') {
     return 'null';
   } else if (data !== undefined && isBinary(data)) {
@@ -55,7 +55,7 @@ const memberTypeToSetType: Document = {
 };
 
 /** DynamoDB set type. */
-class DynamoDBSet {
+export class DynamoDBSet {
   readonly wrappername: string = "Set";
   readonly values: any[]
   readonly type: string;
@@ -93,12 +93,12 @@ class DynamoDBSet {
  * the `wrapNumbers` flag is set. This allows for numeric values that lose
  * precision when converted to JavaScript's `number` type.
  */
-class DynamoDBNumberValue {
+export class DynamoDBNumberValue {
   readonly wrapperName: string = "NumberValue"
   readonly value: string;
   
   /** Creates a dynamodb number value. */
-  constructor(value: number) {
+  constructor(value: number |string) {
     this.value = value.toString();
   }
 
