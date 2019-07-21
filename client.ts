@@ -52,7 +52,8 @@ export function createClient(conf: ClientConfig): DynamoDBClient {
   const ddbc: DynamoDBClient = {};
   
   for (const op of OPS) {
-    ddbc[op] = baseOp.bind(null,_conf, op)
+    const snakeCaseOp: string =  `${op[0].toLowerCase()}${op.slice(1)}`
+    ddbc[snakeCaseOp] = baseOp.bind(null,_conf, op)
   }
   
   return ddbc;
