@@ -63,10 +63,6 @@ async function baseOp(
   query: Document,
   options: Document = {}
 ): Promise<Document> {
-  if (!options.raw && !options.rawInput) {
-    query = Converter.marshall(query);
-  }
-
   const payload: Uint8Array = encode(JSON.stringify(query), "utf8");
   const headers: Headers = createHeaders({
     ...conf,
@@ -91,11 +87,7 @@ async function baseOp(
     }
   );
 
-  if (options.raw || options.rawOutput) {
-    return rawResult;
-  }
-
-  return Converter.unmarshall(rawResult);
+  return rawResult;
 }
 
 /** Creates a DynamoDB client. */
