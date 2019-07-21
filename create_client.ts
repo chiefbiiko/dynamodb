@@ -34,12 +34,12 @@ const OPS: Set<string> = new Set(["BatchGetItem",
 
 /** Base op. */
 async function baseOp (conf: Document, op: string, doc: Document): Promise< Document> {
-  const method: string = "POST"
+  // const method: string = "POST"
   
   const payload: Uint8Array = encode(JSON.stringify(doc), "utf8")
-  const headers: Headers = createHeaders({ ...conf, op, method,  payload } as HeadersConfig)
+  const headers: Headers = createHeaders({ ...conf, op, method:conf.method,  payload } as HeadersConfig)
 
-const response: Response = await fetch(conf.endpoint, {method,  headers,body: payload})
+const response: Response = await fetch(conf.endpoint, {method: conf.method,  headers,body: payload})
 
 return response.json()
 }
@@ -50,9 +50,10 @@ export function createClient(conf: ClientConfig): DynamoDBClient {
     throw new TypeError("client config must include accessKeyId, secretAccessKey and region")
   }
   
+  const method: string = "POST"
      const host: string = conf.region === "local" ? "localhost" : `dynamodb.${conf.region}.amazonaws.com`
      const endpoint: string = `http${conf.region === "local" ? "" : "s"}://${host}:${conf.port ||8000}/`
-     const _conf: Document = { ...conf, host, endpoint}
+     const _conf: Document = { ...conf, host, method, endpoint}
      
   const ddbc: DynamoDBClient = {};
   

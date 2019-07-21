@@ -48,7 +48,7 @@ export function createHeaders(conf: HeadersConfig): Headers {
   
   const canonicalRequest: string = 
    // method + '\n' + canonical_uri + '\n' + canonical_querystring + '\n' + canonical_headers + '\n' + signed_headers + '\n' + payload_hash
-   `${conf.method.trim().toUpperCase()}\n${canonicalUri}\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`
+   `${conf.method}\n${canonicalUri}\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`
   
     const canonicalRequestDigest: string = sha256(canonicalRequest, "utf8", "hex") as string
   
