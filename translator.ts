@@ -3,7 +3,7 @@
 
 import { Converter } from "./converter.ts";
 
-export function Translator(options) {
+export function Translator(options:any = {}) {
   options = options || {};
   this.attrValue = options.attrValue;
   this.convertEmptyValues = Boolean(options.convertEmptyValues);

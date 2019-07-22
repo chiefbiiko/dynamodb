@@ -2,9 +2,7 @@ import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
 import { HeadersConfig, createHeaders } from "./create_headers.ts";
 import { Translator } from "./translator.ts";
 import { Document } from "./types.ts";
-import { api} from "./model/mod.ts"
-
-const TRANSLATOR: Translator = new Translator();
+import { API } from "./model/mod.ts"
 
 /** Generic representation of a DynamoDB client. */
 export interface DynamoDBClient {
@@ -66,9 +64,14 @@ async function baseOp(
   query: Document,
   options: Document = {}
 ): Promise<Document> {
+  let translator: any
+  
   if (!options.raw) {
-    const inputShape: any = api.operations[op].input
-    query = TRANSLATOR.translateInput(query, inputShape)
+    translator = new Translator(options)
+    console.error(">>>>>>>>>>> op", op)
+    console.error(">>>>>>>>>>> API.operations", API.operations)
+    const inputShape: any = API.operations[op].input
+    query = translator.translateInput(query, inputShape)
   }
 
   const payload: Uint8Array = encode(JSON.stringify(query), "utf8");
@@ -99,9 +102,9 @@ async function baseOp(
     return rawResult
   }
 
-const outputShape: any = api.operations[op].output
+const outputShape: any = API.operations[op].output
 
-  return Translator.translateOutput(rawResult, outputShape)
+  return translator.translateOutput(rawResult, outputShape)
 }
 
 /** Creates a DynamoDB client. */

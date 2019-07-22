@@ -48,7 +48,7 @@ export function Api(api: Document = {}, options: Document={}) {
     }
   }
 
-  property(this, 'operations', new Collection(api.operations, options, function(name: string, operation: Document): Operation {
+  property(this, 'operations', new Collection(api.operations, options, function(name: string, operation: Document): any {
     return new Operation(name, operation, options);
   }, stringUtil.lowerFirst, addEndpointOperation));
 

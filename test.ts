@@ -80,4 +80,4 @@ test({
   }
 });
 
-runIfMain(import.meta /*, { skip: /convertable/ }*/);
+runIfMain(import.meta, { only: /convertable/ });
