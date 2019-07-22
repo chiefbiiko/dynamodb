@@ -6,11 +6,11 @@ import {Document, DynamoDBSet, DynamoDBNumberValue, typeOf} from "./types.ts"
 /** Formats a list. */
 function formatList(data: any[], options: Document={}): Document {
   const list: Document = {L: []};
-  
+
   for (let i: number = 0; i < data.length; i++) {
     list['L'].push(Converter.input(data[i], options));
   }
-  
+
   return list;
 }
 
@@ -22,32 +22,32 @@ function convertNumber(value: string, wrapNumbers: boolean = false): any {
 /** Formats a map. */
 function formatMap(data: Document, options: Document = {}): Document {
   const map:Document = {M: {}};
-  
+
   for (const key in data) {
     const formatted: Document = Converter.input(data[key], options);
-    
+
     if (formatted !== void 0) {
       map['M'][key] = formatted;
     }
   }
-  
+
   return map;
 }
 
 /** Formats a set. */
 function formatSet(data: Document, options: Document = {}): Document {
   let values: any[] = data.values;
-  
+
   if (options.convertEmptyValues) {
     values = filterEmptySetValues(data);
-    
+
     if (values.length === 0) {
       return Converter.input(null);
     }
   }
 
   const map:Document = {};
-  
+
   switch (data.type) {
     case 'String': map['SS'] = values; break;
     case 'Binary': map['BS'] = values; break;
@@ -55,26 +55,26 @@ function formatSet(data: Document, options: Document = {}): Document {
       return value.toString();
     });
   }
-  
+
   return map;
 }
 
 /** Filters empty set values. */
 function filterEmptySetValues(set: Document): any[] {
     const nonEmptyValues: any[] = [];
-    
+
     const potentiallyEmptyTypes:Document = {
         String: true,
         Binary: true,
         Number: false
     };
-    
+
     if (potentiallyEmptyTypes[set.type]) {
         for (let i:number = 0; i < set.values.length; i++) {
             if (set.values[i].length === 0) {
                 continue;
             }
-            
+
             nonEmptyValues.push(set.values[i]);
         }
 
@@ -86,7 +86,7 @@ function filterEmptySetValues(set: Document): any[] {
 
 /** aws DynamoDB req/res document converter. */
 export class Converter {
-  
+
 /**
  * Convert a JavaScript value to its equivalent DynamoDB AttributeValue type
  *
@@ -106,10 +106,7 @@ export class Converter {
  * @see AWS.DynamoDB.Converter.marshall AWS.DynamoDB.Converter.marshall to
  *    convert entire records (rather than individual attributes)
  */
-    static input(
-        data: any,
-        options: Document= {}
-    ): Document {
+    static input( data: any, options: Document= {} ): Document {
       var type = typeOf(data);
       if (type === 'Object') {
         return formatMap(data, options);
@@ -171,10 +168,7 @@ export class Converter {
      *    stringSet: new DynamoDBSet(['foo', 'bar', 'baz'])
      *  });
      */
-    static marshall(
-        data: {[key: string]: any},
-        options?: Document
-    ): Document {
+    static marshall( data: Document, options?: Document ): Document {
       return Converter.input(data, options).M;
     }
 
@@ -198,14 +192,11 @@ export class Converter {
      * @see AWS.DynamoDB.Converter.unmarshall AWS.DynamoDB.Converter.unmarshall to
      *    convert entire records (rather than individual attributes)
      */
-    static output(
-        data: Document,
-        options: Document = {}
-    ): any {
+    static output( data: Document, options: Document = {} ): any {
       let list: any[]
       let map: Document
       let i: number;
-      
+
       for (var type in data) {
         var values = data[type];
         if (type === 'M') {
@@ -289,10 +280,7 @@ export class Converter {
      *    boolValue: {BOOL: true}
      *  });
      */
-    static unmarshall(
-        data: Document,
-        options?: Document
-    ): Document {
+    static unmarshall( data: Document, options?: Document ): Document {
      return Converter.output({M: data}, options);
     };
 }
