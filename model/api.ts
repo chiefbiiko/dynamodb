@@ -44,13 +44,13 @@ export function Api(api: Document = {}, options: Document={}) {
 
   function addEndpointOperation(name: string, operation: Document): void {
     if (operation.endpointoperation) {
-      property(self, 'endpointOperation', stringUtil.lowerFirst(name));
+      property(self, 'endpointOperation', /*stringUtil.lowerFirst(name)*/ name);
     }
   }
 
   property(this, 'operations', new Collection(api.operations, options, function(name: string, operation: Document): any {
     return new Operation(name, operation, options);
-  }, stringUtil.lowerFirst, addEndpointOperation));
+  }/*, stringUtil.lowerFirst*/, addEndpointOperation));
 
   property(this, 'shapes', new Collection(api.shapes, options, function(name: string, shape:Document): any {
     return Shape.create(shape, options);

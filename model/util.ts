@@ -1,5 +1,8 @@
 import { Document} from "./../types.ts"
 
+/** noop. */
+export function noop(...args: any[]): void {}
+
 /** Defines a property. */
 export function property(obj:any, name:string, value:any, enumerable?:boolean, isValue?:boolean):void {
   const opts: Document = {
