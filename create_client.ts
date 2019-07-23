@@ -1,7 +1,7 @@
 import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
 import { HeadersConfig, createHeaders } from "./create_headers.ts";
 import { Translator } from "./translator.ts";
-import { Document } from "./types.ts";
+import { Document } from "./util.ts";
 import { API } from "./model/mod.ts"
 
 /** Generic representation of a DynamoDB client. */

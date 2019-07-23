@@ -1,6 +1,6 @@
 // var util = require('../core').util;
 // var convert = require('./converter');
-import { Document} from "./types.ts"
+import { Document} from "./util.ts"
 import { Converter } from "./converter.ts";
 
 export function Translator(options:Document = {}) {

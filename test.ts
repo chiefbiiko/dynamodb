@@ -2,7 +2,7 @@ import { test, runIfMain } from "https://deno.land/std/testing/mod.ts";
 
 import { assert, assertEquals } from "https://deno.land/std/testing/asserts.ts";
 
-import { Document } from "./types.ts";
+import { Document } from "./util.ts";
 
 import { ClientConfig, DynamoDBClient, createClient } from "./create_client.ts";
 
