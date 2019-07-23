@@ -45,15 +45,17 @@ export function Operation(name: string, operation: Document, options: Document={
   });
 
   memoizedProperty(this, 'errors', function(): any[] {
-    const list: any[] = [];
-
-    if (!operation.errors){ return null;}
-
-    for (let i: number = 0; i < operation.errors.length; i++) {
-      list.push(Shape.create(operation.errors[i], options));
-    }
-
-    return list;
+        if (!operation.errors){ return null;}
+        
+        return operation.errors.map((error:any): any => Shape.create(error, options))
+        
+    // const list: any[] = [];
+    // 
+    // for (let i: number = 0; i < operation.errors.length; i++) {
+    //   list.push(Shape.create(operation.errors[i], options));
+    // }
+    // 
+    // return list;
   });
 
   memoizedProperty(this, 'paginator', function(): any {
@@ -67,25 +69,28 @@ export function Operation(name: string, operation: Document, options: Document={
 
   // idempotentMembers only tracks top-level input shapes
   memoizedProperty(this, 'idempotentMembers', function(): string[] {
-    const idempotentMembers: string[] = [];
-    const input: Document = self.input;
-    const members: Document = input.members;
+    // const idempotentMembers: string[] = [];
+    // const input: Document = self.input;
+    // const members: Document = input.members;
 
-    if (!input.members) {
-      return idempotentMembers;
+    if (!self.input.members) {
+      return []//idempotentMembers;
     }
 
-    for (const name in members) {
-      if (!members.hasOwnProperty(name)) {
-        continue;
-      }
+return Object.entries(self.input.members).filter(([_, value]: [string, Document]): boolean => value.isIdempotent)
+  .map(([key, _]: [string, Document]): string => key)
 
-      if (members[name].isIdempotent === true) {
-        idempotentMembers.push(name);
-      }
-    }
-
-    return idempotentMembers;
+    // for (const name in members) {
+    //   if (!members.hasOwnProperty(name)) {
+    //     continue;
+    //   }
+    // 
+    //   if (members[name].isIdempotent) {
+    //     idempotentMembers.push(name);
+    //   }
+    // }
+    // 
+    // return idempotentMembers;
   });
 
   memoizedProperty(this, 'hasEventOutput', function(): boolean {
