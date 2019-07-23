@@ -68,25 +68,32 @@ async function baseOp(
       console.error(">>>>>>>>>>> op", op)
   console.error("\n>>>>>>>>>>>>> raw query", JSON.stringify(query))
   if (!options.raw) {
-    translator = new Translator(options)
+    /*
+    options.attrValue =
+      self.service.api.operations.putItem.input.members.Item.value.shape;
+    */
+    translator = new Translator({...options, attrValue: API.operations.PutItem.input.members.Item.value.shape})  
+    // translator = new Translator(options)
 
-    // console.error(">>>>>>>>>>> API.operations", API.operations)
+        // console.error(">>>>>>>>>>> API.operations", API.operations)
     // console.error(">>>>>>>>>>> API.operations[op].input", API.operations[op].input)
     const inputShape: any = API.operations[op].input
     // TODO
     // var preserve = {}
-    const preserve: Document = //{}
+    // const preserve: Document = //{}
     // for each inputShape.members prop if value == empty object then preserve[key] = value
-    Object.entries(inputShape.members).reduce((acc: Document, [key, value]: [string, string]): Document => {
-      if (!Object.keys(value).length) {
-        acc[key] = query[key]  
-      }
-      
-      return acc
-    }, {})
-    console.error(">>>>>>>>>>>>>> PRESERVE", JSON.stringify(preserve))
-    query = { ...translator.translateInput(query, inputShape), ...preserve }
-    // query = translator.translateInput(query, inputShape)
+    // const toTranslate: Document =  Object.entries(inputShape.members).reduce((acc: Document, [key, value]: [string, string]): Document => {
+    //   console.error(">>>>>>>>> CHECK", key)
+    //   if (key === "Key" || key === "Item") {
+    //     console.log(">>>>>>>>>>>>> translateE KEY", key)
+    //     acc[key] = query[key]  
+    //   }
+    // 
+    //   return acc
+    // }, {})
+    // console.error(">>>>>>>>>>>>>> TOTRANSLATE", JSON.stringify(toTranslate))
+    // query = { ...query, ...translator.translateInput(toTranslate, inputShape).M }
+    query = translator.translateInput(query, inputShape)
   }
 
 console.error(">>>>>>>>>>>>> query", JSON.stringify(query), "\n")
@@ -121,7 +128,7 @@ console.error(">>>>>>>>> rawResult", JSON.stringify(rawResult))
 
 const outputShape: any = API.operations[op].output
 var result = translator.translateOutput(rawResult, outputShape)
-// console.error(">>>>>>>>>>> result", result)
+console.error(">>>>>>>>>>> result", result)
   return result
 }
 
