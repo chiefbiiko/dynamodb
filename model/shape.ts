@@ -222,11 +222,15 @@ function StructureShape(shape: Document, options: Document={}) {
 
     property(this, 'isRequired', function(name: string): boolean {
       if (!requiredMap) {
-        requiredMap = {};
-
-        for (let i:number = 0; i < shape.required.length; i++) {
-          requiredMap[shape.required[i]] = true;
-        }
+        // requiredMap = {};
+        // 
+        // for (let i:number = 0; i < shape.required.length; i++) {
+        //   requiredMap[shape.required[i]] = true;
+        // }
+        requiredMap = shape.required.reduce((acc: Document, req: string): Document => {
+          acc[req] = true
+          return acc
+        }, {})
       }
 
       return requiredMap[name];
@@ -323,7 +327,7 @@ function TimestampShape(shape: Document) {
     }
   }
 
-  this.toType = function(value: any):any {
+  this.toType = function(value: any):Date {
     if (value === null || value === undefined) {return null;}
 
     if (typeof value.toUTCString === 'function') {return value;}
@@ -332,7 +336,7 @@ function TimestampShape(shape: Document) {
            dateUtil.parseTimestamp(value) : null;
   };
 
-  this.toWireFormat = function(value: any): any {
+  this.toWireFormat = function(value: any): string {
     return dateUtil.format(value, self.timestampFormat);
   };
 }
@@ -362,7 +366,7 @@ function StringShape() {
 function FloatShape() {
   Shape.apply(this, arguments);
 
-  this.toType = function(value: any): any {
+  this.toType = function(value: any): number {
     if (value === null || value === undefined) {return null;}
 
     return parseFloat(value);
@@ -374,7 +378,7 @@ function FloatShape() {
 function IntegerShape() {
   Shape.apply(this, arguments);
 
-  this.toType = function(value: any):any {
+  this.toType = function(value: any):number {
     if (value === null || value === undefined) {return null;}
 
     return parseInt(value, 10);
@@ -398,7 +402,7 @@ function Base64Shape() {
 function BooleanShape() {
   Shape.apply(this, arguments);
 
-  this.toType = function(value: any):any {
+  this.toType = function(value: any): boolean {
     if (typeof value === 'boolean') {return value;}
 
     if (value === null || value === undefined) {return null;}
