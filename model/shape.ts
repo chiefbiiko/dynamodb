@@ -3,7 +3,7 @@ fromUint8Array as base64FromUint8Array} from "https://deno.land/x/base64/mod.ts"
 import { Collection } from "./collection.ts";
 import { Document } from "./../types.ts"
 import { memoizedProperty as utilMemoizedProperty, property as utilProperty,
-date as dateUtil} from "./util.ts"
+date as dateUtil} from "./../util.ts"
 
 function property(obj: any, name: string, value:any, enumerable?: boolean, isValue?:boolean): void {
   if (value !== null && value !== undefined) {

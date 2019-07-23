@@ -1,7 +1,7 @@
 import { Collection} from "./collection.ts"
 import { Operation} from "./operation.ts"
 import {Shape} from "./shape.ts"
-import { memoizedProperty, property, string as stringUtil} from "./util.ts"
+import { memoizedProperty, property, string as stringUtil} from "./../util.ts"
 import { Document} from "./../types.ts"
 
 // var Paginator = require('./paginator');

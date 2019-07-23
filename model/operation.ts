@@ -4,7 +4,7 @@ import { Shape } from "./shape.ts"
 // var util = require('../util');
 // var property = util.property;
 // var memoizedProperty = util.memoizedProperty;
-import { memoizedProperty, property} from "./util.ts"
+import { memoizedProperty, property} from "./../util.ts"
 import { Document} from "./../types.ts"
 
 export function Operation(name: string, operation: Document, options: Document={}) {
