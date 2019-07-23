@@ -65,14 +65,31 @@ async function baseOp(
   options: Document = {}
 ): Promise<Document> {
   let translator: any
-  
+      console.error(">>>>>>>>>>> op", op)
+  console.error("\n>>>>>>>>>>>>> raw query", JSON.stringify(query))
   if (!options.raw) {
     translator = new Translator(options)
-    console.error(">>>>>>>>>>> op", op)
-    console.error(">>>>>>>>>>> API.operations", API.operations)
+
+    // console.error(">>>>>>>>>>> API.operations", API.operations)
+    // console.error(">>>>>>>>>>> API.operations[op].input", API.operations[op].input)
     const inputShape: any = API.operations[op].input
-    query = translator.translateInput(query, inputShape)
+    // TODO
+    // var preserve = {}
+    const preserve: Document = //{}
+    // for each inputShape.members prop if value == empty object then preserve[key] = value
+    Object.entries(inputShape.members).reduce((acc: Document, [key, value]: [string, string]): Document => {
+      if (!Object.keys(value).length) {
+        acc[key] = query[key]  
+      }
+      
+      return acc
+    }, {})
+    console.error(">>>>>>>>>>>>>> PRESERVE", JSON.stringify(preserve))
+    query = { ...translator.translateInput(query, inputShape), ...preserve }
+    // query = translator.translateInput(query, inputShape)
   }
+
+console.error(">>>>>>>>>>>>> query", JSON.stringify(query), "\n")
 
   const payload: Uint8Array = encode(JSON.stringify(query), "utf8");
   const headers: Headers = createHeaders({
@@ -88,8 +105,8 @@ async function baseOp(
     body: payload
   }).then(
     (response: Response): Document => {
-      // console.error(">>>>>>> response.status", response.status)
-      // console.error(">>>>>>>>> response.statusText", response.statusText)
+      console.error(">>>>>>> response.status", response.status," response.statusText", response.statusText)
+      // console.error(">>>>>>> response.statusText", response.statusText)
       // if (!response.ok) {
       //   throw new Error("http query request failed")
       // }
@@ -97,14 +114,15 @@ async function baseOp(
       return response.json();
     }
   );
-
+console.error(">>>>>>>>> rawResult", JSON.stringify(rawResult))
   if (options.raw) {
     return rawResult
   }
 
 const outputShape: any = API.operations[op].output
-
-  return translator.translateOutput(rawResult, outputShape)
+var result = translator.translateOutput(rawResult, outputShape)
+// console.error(">>>>>>>>>>> result", result)
+  return result
 }
 
 /** Creates a DynamoDB client. */
@@ -131,8 +149,8 @@ export function createClient(conf: ClientConfig): DynamoDBClient {
   const ddbc: DynamoDBClient = {};
 
   for (const op of OPS) {
-    const snakeCaseOp: string = `${op[0].toLowerCase()}${op.slice(1)}`;
-    ddbc[snakeCaseOp] = baseOp.bind(null, _conf, op);
+    const camelCaseOp: string = `${op[0].toLowerCase()}${op.slice(1)}`;
+    ddbc[camelCaseOp] = baseOp.bind(null, _conf, op);
   }
 
   return ddbc;

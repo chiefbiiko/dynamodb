@@ -56,25 +56,24 @@ test({
 
     let response: Document = await ddbc.createTable(
       {
-        TableName: "users",
+        TableName: "UsersA",
         KeySchema: [{ KeyType: "HASH", AttributeName: "uuid" }],
         AttributeDefinitions: [{ AttributeName: "uuid", AttributeType: "S" }],
         ProvisionedThroughput: { ReadCapacityUnits: 1, WriteCapacityUnits: 1 }
-      },
-      { raw: true }
+      }
     );
 
     response = await ddbc.putItem({
-      TableName: "users",
+      TableName: "UsersA",
       Item: { uuid: "abc", friends: ["djb", "devil"] }
     });
 
     response = await ddbc.getItem({
-      TableName: "users",
+      TableName: "UsersA",
       Key: { uuid: "abc" }
     });
 
-    console.error(">>>>>>> response", JSON.stringify(response));
+    // console.error(">>>>>>> response", JSON.stringify(response));
 
     assertEquals(response.Item.friends, ["djb", "devil"]);
   }
