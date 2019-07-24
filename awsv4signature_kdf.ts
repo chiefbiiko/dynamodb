@@ -5,7 +5,7 @@ import {
 
 import { hmac } from "https://denopkg.com/chiefbiiko/hmac/mod.ts";
 
-import { DATE_STAMP_REGEX, formatDateStamp } from "./format_date.ts";
+import { date } from "./util.ts";
 
 /** Some magic bytes. */
 const AWS4: Uint8Array = encode("AWS4", "utf8");
@@ -24,8 +24,8 @@ export function awsv4SignatureKDF(
   }
 
   if (typeof dateStamp !== "string") {
-    dateStamp = formatDateStamp(dateStamp);
-  } else if (!DATE_STAMP_REGEX.test(dateStamp)) {
+    dateStamp = date.format(dateStamp, "dateStamp");
+  } else if (!date.DATE_STAMP_REGEX.test(dateStamp)) {
     throw new TypeError("date stamp format must be yyyymmdd");
   }
 
@@ -37,7 +37,7 @@ export function awsv4SignatureKDF(
   let mac: Uint8Array = hmac(
     "sha256",
     paddedKey,
-    dateStamp,
+    dateStamp as string,
     "utf8"
   ) as Uint8Array;
 

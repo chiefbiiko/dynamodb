@@ -2,8 +2,7 @@ import { toUint8Array as base64ToUint8Array,
 fromUint8Array as base64FromUint8Array} from "https://deno.land/x/base64/mod.ts"
 import { Collection } from "./collection.ts";
 // import { Document } from "./../types.ts"
-import { Document, memoizedProperty as utilMemoizedProperty, property as utilProperty,
-date as dateUtil} from "./../util.ts"
+import { Document,date, memoizedProperty as utilMemoizedProperty, property as utilProperty} from "./../util.ts"
 
 function property(obj: any, name: string, value:any, enumerable?: boolean, isValue?:boolean): void {
   if (value !== null && value !== undefined) {
@@ -333,11 +332,11 @@ function TimestampShape(shape: Document) {
     if (typeof value.toUTCString === 'function') {return value;}
 
     return typeof value === 'string' || typeof value === 'number' ?
-           dateUtil.parseTimestamp(value) : null;
+           date.parseTimestamp(value) : null;
   };
 
   this.toWireFormat = function(value: any): string {
-    return dateUtil.format(value, self.timestampFormat);
+    return date.format(value, self.timestampFormat);
   };
 }
 

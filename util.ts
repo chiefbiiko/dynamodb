@@ -1,3 +1,6 @@
+const ANY_BUT_DIGITS: RegExp = /[^\d]/g;
+const ANY_BUT_DIGITS_T: RegExp = /[^\dT]/g;
+
 /** Generic document. */
 export interface Document {
   [key: string]: any;
@@ -154,6 +157,20 @@ export class DynamoDBNumberValue {
 
 /** Date format helpers. */
 export const date: Document = {
+  /** Date stamp format as expected by awsv4SignatureKDF. */
+ DATE_STAMP_REGEX: /^\d{8}$/,
+  amz(date: Date): string {
+    return `${date
+      .toISOString()
+      .slice(0, 19)
+      .replace(ANY_BUT_DIGITS_T, "")}Z`;
+  },
+  dateStamp(date: Date): string {
+    return date
+      .toISOString()
+      .slice(0, 10)
+      .replace(ANY_BUT_DIGITS, "");
+  },
   from(date: number | string | Date): Date {
   if (typeof date === 'number') {
     return new Date(date * 1000); // unix timestamp
@@ -170,7 +187,7 @@ rfc822(date: Date = new Date()): string {
 unixTimestamp(date: Date = new Date()): number {
   return date.getTime() / 1000;
 },
-/** Valid formats are: iso8601, rfc822, unixTimestamp. */
+/** Valid formats are: iso8601, rfc822, unixTimestamp, dateStamp, amz. */
 format(date: Date, formatter: string = 'iso8601'): number | string {
   return this[formatter](this.from(date));
 },
@@ -187,11 +204,4 @@ parseTimestamp(value: number | string): Date {
      throw new Error(`unhandled timestamp format: ${value}`);
    }
  }
-}
-
-/** String helpers. */
-export const string: Document = {
-  lowerFirst(s: string): string {
-    return `${s[0].toLowerCase()}${s.substr(1)}`
-  }
 }

@@ -2,7 +2,7 @@ import { sha256 } from "https://denopkg.com/chiefbiiko/sha256/mod.ts";
 import { hmac } from "https://denopkg.com/chiefbiiko/hmac/mod.ts";
 import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
 import { awsv4SignatureKDF } from "./awsv4signature_kdf.ts";
-import { formatAmzDate, formatDateStamp } from "./format_date.ts";
+import { date } from "./util.ts";
 import { ClientConfig } from "./create_client.ts";
 
 /** Service name. */
@@ -26,9 +26,9 @@ export interface HeadersConfig extends ClientConfig {
 /** Assembles a header object for a DynamoDB request. */
 export function createHeaders(conf: HeadersConfig): Headers {
   const amzTarget: string = `DynamoDB_20120810.${conf.op}`;
-  const date: Date = conf.date || new Date();
-  const amzDate: string = formatAmzDate(date);
-  const dateStamp: string = formatDateStamp(date);
+  const d: Date = conf.date || new Date();
+  const amzDate: string = date.format(d, "amz");
+  const dateStamp: string = date.format(d, "dateStamp");
   const canonicalUri: string = conf.canonicalUri || "/";
 
   const canonicalHeaders: string = `content-type:${POST_CONTENT_TYPE}\nhost:${
@@ -71,12 +71,10 @@ export function createHeaders(conf: HeadersConfig): Headers {
     conf.accessKeyId
   }/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
-  const headers: Headers = new Headers({
+  return new Headers({
     "Content-Type": POST_CONTENT_TYPE,
     "X-Amz-Date": amzDate,
     "X-Amz-Target": amzTarget,
     Authorization: authorizationHeader
   });
-
-  return headers;
 }
