@@ -33,14 +33,14 @@ export function Shape(shape: Document, options: Document = {}, memberName: strin
   property(this, 'isShape', true, false);
   property(this, 'isQueryName', Boolean(shape.queryName), false);
   property(this, 'isLocationName', Boolean(shape.locationName), false);
-  property(this, 'isIdempotent', shape.idempotencyToken === true);
-  property(this, 'isJsonValue', shape.jsonvalue === true);
-  property(this, 'isSensitive', shape.sensitive === true || shape.prototype && shape.prototype.sensitive === true);
+  property(this, 'isIdempotent', shape.idempotencyToken);
+  property(this, 'isJsonValue', shape.jsonvalue);
+  property(this, 'isSensitive', shape.sensitive || shape.prototype && shape.prototype.sensitive);
   property(this, 'isEventStream', Boolean(shape.eventstream), false);
   property(this, 'isEvent', Boolean(shape.event), false);
   property(this, 'isEventPayload', Boolean(shape.eventpayload), false);
   property(this, 'isEventHeader', Boolean(shape.eventheader), false);
-  property(this, 'isTimestampFormatSet', Boolean(shape.timestampFormat) || shape.prototype && shape.prototype.isTimestampFormatSet === true, false);
+  property(this, 'isTimestampFormatSet', Boolean(shape.timestampFormat) || shape.prototype && shape.prototype.isTimestampFormatSet, false);
   property(this, 'endpointDiscoveryId', Boolean(shape.endpointdiscoveryid), false);
   property(this, 'hostLabel', Boolean(shape.hostLabel), false);
 
@@ -99,7 +99,7 @@ Shape.resolve = function resolve(shape: Document, options: Document={}): Documen
     const refShape: Document = options.api.shapes[shape.shape];
 
     if (!refShape) {
-      throw new Error('Cannot find shape reference: ' + shape.shape);
+      throw new Error(`Cannot find shape reference: ${shape.shape}`);
     }
 
     return refShape;
@@ -222,7 +222,7 @@ function StructureShape(shape: Document, options: Document={}) {
     property(this, 'isRequired', function(name: string): boolean {
       if (!requiredMap) {
         // requiredMap = {};
-        // 
+        //
         // for (let i:number = 0; i < shape.required.length; i++) {
         //   requiredMap[shape.required[i]] = true;
         // }

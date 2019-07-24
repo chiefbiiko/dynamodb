@@ -8,7 +8,7 @@ const ATTR_VALUE: string = API.operations.PutItem.input.members.Item.value.shape
 
 /** Generic representation of a DynamoDB client. */
 export interface DynamoDBClient {
-  [key: string]: (query: Document, options?: Document) => Promise<Document>;
+  [key: string]: (query?: Document, options?: Document) => Promise<Document>;
 }
 
 /** Client configuration. */
@@ -20,7 +20,7 @@ export interface ClientConfig {
   port?: number; // 8000
 }
 
-const OPS: Set<string> = new Set([
+export const OPS: Set<string> = new Set([
   "BatchGetItem",
   "BatchWriteItem",
   "CreateBackup",
@@ -63,7 +63,7 @@ const OPS: Set<string> = new Set([
 async function baseOp(
   conf: Document,
   op: string,
-  query: Document,
+  query: Document = {},
   options: Document = {}
 ): Promise<Document> {
   let translator: any
@@ -74,7 +74,7 @@ async function baseOp(
     options.attrValue =
       self.service.api.operations.putItem.input.members.Item.value.shape;
     */
-    translator = new Translator({...options, attrValue: ATTR_VALUE})  
+    translator = new Translator({...options, attrValue: ATTR_VALUE})
     // translator = new Translator(options)
 
         // console.error(">>>>>>>>>>> API.operations", API.operations)
@@ -88,9 +88,9 @@ async function baseOp(
     //   console.error(">>>>>>>>> CHECK", key)
     //   if (key === "Key" || key === "Item") {
     //     console.log(">>>>>>>>>>>>> translateE KEY", key)
-    //     acc[key] = query[key]  
+    //     acc[key] = query[key]
     //   }
-    // 
+    //
     //   return acc
     // }, {})
     // console.error(">>>>>>>>>>>>>> TOTRANSLATE", JSON.stringify(toTranslate))

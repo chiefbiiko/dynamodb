@@ -1,5 +1,5 @@
 // import DynamoDB = require('../../clients/dynamodb');
-import { toUint8Array as base64ToUint8Array} from "https://deno.land/x/base64/mod.ts"
+import { toUint8Array as base64ToUint8Array, fromUint8Array as base64FromUint8Array} from "https://deno.land/x/base64/mod.ts"
 
 import {Document, DynamoDBSet, DynamoDBNumberValue, typeOf} from "./util.ts"
 
@@ -108,7 +108,7 @@ export class Converter {
  */
     static input( data: any, options: Document= {} ): Document {
       const  type:string = typeOf(data);
-      
+
       if (type === 'Object') {
         return formatMap(data, options);
       } else if (type === 'Array') {
@@ -126,7 +126,8 @@ export class Converter {
         if (data.length === 0 && options.convertEmptyValues) {
           return Converter.input(null);
         }
-        return { B: data };
+        // return { B: data };
+          return { B: base64FromUint8Array(data) };
       } else if (type === 'Boolean') {
         return { BOOL: data };
       } else if (type === 'null') {
@@ -196,14 +197,14 @@ export class Converter {
     static output( data: Document, options: Document = {} ): any {
       for (const type in data) {
        const values: any = data[type];
-       
+
         if (type === 'M') {
           const map: Document = {};
-          
+
           for (const key in values) {
             map[key] = Converter.output(values[key], options);
           }
-          
+
           return map;
         } else if (type === 'L') {
           // list = [];

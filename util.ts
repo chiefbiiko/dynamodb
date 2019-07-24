@@ -65,7 +65,7 @@ function isBinary(data: any): boolean {
     'Int16Array', 'Uint16Array', 'Int32Array', 'Uint32Array',
     'Float32Array', 'Float64Array'
   ];
-  
+
   // if (util.isNode()) {
   //   var Stream = util.stream.Stream;
   //   if (util.Buffer.isBuffer(data) || data instanceof Stream) {
@@ -73,12 +73,26 @@ function isBinary(data: any): boolean {
   //   }
   // }
 
-  for (var i = 0; i < types.length; i++) {
-    if (data !== undefined && data.constructor) {
-      // if (util.isType(data, types[i])) return true;
-      if (data.constructor.name === types[i]) {return true;}
-    }
+   // var isType = (obj, type) => Object.prototype.toString.call(obj) === '[object ' + type + ']';
+
+   if (data !== undefined && data.constructor) {
+     // console.error(">>>>>>>>>> isBinary data", data)
+    //  for (let i: number = 0; i < types.length; i++) {
+    //
+    //   // if (util.isType(data, types[i])) return true;
+    //   if (data.constructor.name === types[i]) {
+    //     // console.error(">>>> isBinary TRUE", data)
+    //     return true;
+    //   }
+    //   // if(isType(data, types[i])) {
+    //   //   return true
+    //   // }
+    //
+    // }
+    return types.some((type: string): boolean => data.constructor.name === type)
   }
+
+  // console.error(">>>> isBinary FALSE", data)
 
   return false;
 }
@@ -96,17 +110,17 @@ export class DynamoDBSet {
   readonly wrappername: string = "Set";
   readonly values: any[]
   readonly type: string;
-  
+
   /** Creates a dynamodb set. */
   constructor(list: any[]=[], options: Document={}) {
     this.values = [].concat(list);
-    
+
     this.type = memberTypeToSetType[typeOf(this.values[0])];
-    
+
     if (!this.type) {
       throw new Error("DynamoDB sets can only contain string, number, or binary values")
     }
-    
+
     if (options.validate) {
       for (const value of this.values) {
         if (memberTypeToSetType[typeOf(value)] !== this.type) {
@@ -133,7 +147,7 @@ export class DynamoDBSet {
 export class DynamoDBNumberValue {
   readonly wrapperName: string = "NumberValue"
   readonly value: string;
-  
+
   /** Creates a dynamodb number value. */
   constructor(value: number |string) {
     this.value = value.toString();

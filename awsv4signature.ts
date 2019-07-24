@@ -10,8 +10,13 @@ import { date } from "./util.ts";
 /** Some magic bytes. */
 const AWS4: Uint8Array = encode("AWS4", "utf8");
 
+/** Creates a HMAC-SHA256 mac.*/
+export function awsv4Signature(key: Uint8Array, msg: Uint8Array, inputEncoding?: string): string | Uint8Array {
+  return hmac("sha256", key, msg, null, inputEncoding);
+}
+
 /** Creates a key for generating an aws signature version 4. */
-export function awsv4SignatureKDF(
+export function kdf(
   key: string | Uint8Array,
   dateStamp: Date | string,
   region: string,
