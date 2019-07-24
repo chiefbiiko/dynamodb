@@ -2,7 +2,9 @@ import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
 import { HeadersConfig, createHeaders } from "./create_headers.ts";
 import { Translator } from "./translator.ts";
 import { Document } from "./util.ts";
-import { API } from "./model/mod.ts"
+import { API } from "./api/mod.ts"
+
+const ATTR_VALUE: string = API.operations.PutItem.input.members.Item.value.shape;
 
 /** Generic representation of a DynamoDB client. */
 export interface DynamoDBClient {
@@ -66,13 +68,13 @@ async function baseOp(
 ): Promise<Document> {
   let translator: any
       console.error(">>>>>>>>>>> op", op)
-  console.error("\n>>>>>>>>>>>>> raw query", JSON.stringify(query))
+  console.error("\n>>>>>>>>>>>>> user query", JSON.stringify(query))
   if (!options.raw) {
     /*
     options.attrValue =
       self.service.api.operations.putItem.input.members.Item.value.shape;
     */
-    translator = new Translator({...options, attrValue: API.operations.PutItem.input.members.Item.value.shape})  
+    translator = new Translator({...options, attrValue: ATTR_VALUE})  
     // translator = new Translator(options)
 
         // console.error(">>>>>>>>>>> API.operations", API.operations)
@@ -96,7 +98,7 @@ async function baseOp(
     query = translator.translateInput(query, inputShape)
   }
 
-console.error(">>>>>>>>>>>>> query", JSON.stringify(query), "\n")
+console.error(">>>>>>>>>>>>> prep query", JSON.stringify(query), "\n")
 
   const payload: Uint8Array = encode(JSON.stringify(query), "utf8");
   const headers: Headers = createHeaders({

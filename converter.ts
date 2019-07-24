@@ -107,7 +107,8 @@ export class Converter {
  *    convert entire records (rather than individual attributes)
  */
     static input( data: any, options: Document= {} ): Document {
-      var type = typeOf(data);
+      const  type:string = typeOf(data);
+      
       if (type === 'Object') {
         return formatMap(data, options);
       } else if (type === 'Array') {
@@ -193,44 +194,47 @@ export class Converter {
      *    convert entire records (rather than individual attributes)
      */
     static output( data: Document, options: Document = {} ): any {
-      let list: any[]
-      let map: Document
-      let i: number;
-
-      for (var type in data) {
-        var values = data[type];
+      for (const type in data) {
+       const values: any = data[type];
+       
         if (type === 'M') {
-          map = {};
-          for (var key in values) {
+          const map: Document = {};
+          
+          for (const key in values) {
             map[key] = Converter.output(values[key], options);
           }
+          
           return map;
         } else if (type === 'L') {
-          list = [];
-          for (i = 0; i < values.length; i++) {
-            list.push(Converter.output(values[i], options));
-          }
-          return list;
+          // list = [];
+          // for (i = 0; i < values.length; i++) {
+          //   list.push(Converter.output(values[i], options));
+          // }
+          // return list;
+          return values.map((value: any): any => Converter.output(value, options))
         } else if (type === 'SS') {
-          list = [];
-          for (i = 0; i < values.length; i++) {
-            list.push(values[i] + '');
-          }
-          return new DynamoDBSet(list);
+          // list = [];
+          // for (i = 0; i < values.length; i++) {
+          //   list.push(values[i] + '');
+          // }
+          // return new DynamoDBSet(list);
+            return new DynamoDBSet(values.map(String))
         } else if (type === 'NS') {
-          list = [];
-          for (i = 0; i < values.length; i++) {
-            list.push(convertNumber(values[i], options.wrapNumbers));
-          }
-          return new DynamoDBSet(list);
+          // list = [];
+          // for (i = 0; i < values.length; i++) {
+          //   list.push(convertNumber(values[i], options.wrapNumbers));
+          // }
+          // return new DynamoDBSet(list);
+            return new DynamoDBSet(values.map((value:any): number => convertNumber(value, options.wrapNumbers)))
         } else if (type === 'BS') {
-          list = [];
-          for (i = 0; i < values.length; i++) {
-            list.push(base64ToUint8Array(values[i]));
-          }
-          return new DynamoDBSet(list);
+          // list = [];
+          // for (i = 0; i < values.length; i++) {
+          //   list.push(base64ToUint8Array(values[i]));
+          // }
+          // return new DynamoDBSet(list);
+            return new DynamoDBSet(values.map(base64ToUint8Array))
         } else if (type === 'S') {
-          return values + '';
+          return String(values);
         } else if (type === 'N') {
           return convertNumber(values, options.wrapNumbers);
         } else if (type === 'B') {

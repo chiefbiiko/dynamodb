@@ -29,21 +29,21 @@ test({
     response = await ddbc.putItem({
       TableName: "users",
       Item: { uuid: { S: "abc" }, role: { S: "admin" } }
-    });
+    }, { raw: true });
 
     assertEquals(response, {});
 
     response = await ddbc.getItem({
       TableName: "users",
       Key: { uuid: { S: "abc" } }
-    });
+    }, { raw: true });
 
     assertEquals(response.Item.role.S, "admin");
 
     response = await ddbc.deleteItem({
       TableName: "users",
       Key: { uuid: { S: "abc" } }
-    });
+    }, { raw: true });
 
     assertEquals(response, {});
   }
@@ -73,10 +73,8 @@ test({
       Key: { uuid: "abc" }
     });
 
-    // console.error(">>>>>>> response", JSON.stringify(response));
-
     assertEquals(response.Item.friends, ["djb", "devil"]);
   }
 });
 
-runIfMain(import.meta, { only: /convertable/ });
+runIfMain(import.meta);
