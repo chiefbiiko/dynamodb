@@ -70,7 +70,7 @@ test({
       { raw: true }
     );
 
-    // assertEquals(response, {});
+    assertEquals(response.TableDescription.TableName, "users_a");
 
     response = await ddbc.listTables();
 
@@ -112,7 +112,7 @@ test({
       TableName: "users_b"
     });
 
-    // assertEquals(response, {});
+    assertEquals(response.TableDescription.TableName, "users_b");
 
     response = await ddbc.listTables();
 
@@ -162,6 +162,16 @@ test({
     });
 
     assertEquals(response.Count, N);
+    
+    response = await ddbc.deleteTable({
+      TableName: "users_c"
+    });
+
+    assertEquals(response.TableDescription.TableName, "users_c");
+    
+    response = await ddbc.listTables();
+
+    assert(!response.TableNames.includes("users_c"));
   }
 });
 
@@ -208,7 +218,7 @@ test({
       TableName: "users_d"
     });
 
-    // assertEquals(response, {});
+    assertEquals(response.TableDescription.TableName, "users_d");
 
     response = await ddbc.listTables();
 
@@ -269,56 +279,32 @@ test({
 
     assertEquals(unprocessed, 0);
 
-    // await new Promise(r => setTimeout(r, 1000))
-
     const it: any= await  ddbc.scan({ TableName: "users_e" }, { iteratePages: true })
-// console.error(">>>>>>>>>>>>>>> it", it , typeof it)
+
     let pages: number = 0
     let items: number = 0
 
     for await (const page of it) {
-      // console.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> PAGE", JSON.stringify(page))
-      pages += 1
+      ++pages
 
       items += page.Count
-// console.error(">>>>>> page.Count", page.Count)
+
       assert(Array.isArray(page.Items))
     }
-    
-    // console.error(">>>>>>>>>>>>>> pages, items", pages, items)
 
-    assert(pages > 1, "pages not gt 1")
+    assert(pages > 1)
 
     assertEquals(items, N)
+    
+    response = await ddbc.deleteTable({
+      TableName: "users_e"
+    });
 
-    // response = await ddbc.scan({
-    //   TableName: "users_e"
-    // })
-    //
-    // assert(!!response.LastEvaluatedKey)
-    //
-    // let lastEvaluatedKey: string =  response.LastEvaluatedKey
-    // let pages: number = 0
-    //
-    // for(;;) {
-    //   response = await ddbc.scan({
-    //     TableName: "users_e",
-    //     ExclusiveStartKey: lastEvaluatedKey
-    //   })
-    //
-    //   assert(Array.isArray(response.Items))
-    //
-    //   ++pages
-    //
-    //   if (!response.LastEvaluatedKey) {
-    //     break
-    //   }
-    //
-    //   lastEvaluatedKey = response.LastEvaluatedKey
-    // }
-    //
-    // assert(pages > 1)
+    assertEquals(response.TableDescription.TableName, "users_e");
 
+    response = await ddbc.listTables();
+
+    assert(!response.TableNames.includes("users_e"));
   }
 });
 

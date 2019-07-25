@@ -77,9 +77,10 @@ async function baseFetch(conf: Document, op: string, query: Document): Promise<D
       body: payload
     }).then(
       (response: Response): Document => {
-        console.error(">>>>>>> response.status", response.status," response.statusText", response.statusText)
+        // console.error(">>>>>>> op response.status",op,  response.status," response.statusText", response.statusText)
         // console.error(">>>>>>> response.statusText", response.statusText)
         if (!response.ok) {
+          // console.error("RESPONSE >>>>>>>>>>>>>>>>>>>>>>>>>>>> ", JSON.stringify(await response.json()))
           throw new Error(`http query request failed: ${response.status} ${response.statusText}`)
         }
 
@@ -96,7 +97,7 @@ async function baseOp(
   options: Document = {}
 ): Promise<Document> {
   let translator: any
-      // console.error(">>>>>>>>>>> op", op)
+  //     console.error(">>>>>>>>>>> op", op)
   // console.error("\n>>>>>>>>>>>>> user query", JSON.stringify(query))
   if (!options.raw) {
     /*
