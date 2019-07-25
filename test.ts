@@ -276,15 +276,18 @@ test({
     let pages: number = 0
     let items: number = 0
 
-    for await(const page of it) {
-      ++pages
+    for await (const page of it) {
+      // console.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> PAGE", JSON.stringify(page))
+      pages += 1
 
       items += page.Count
-console.error(">>>>>> page.Count", page.Count)
+// console.error(">>>>>> page.Count", page.Count)
       assert(Array.isArray(page.Items))
     }
+    
+    // console.error(">>>>>>>>>>>>>> pages, items", pages, items)
 
-    assert(pages > 1)
+    assert(pages > 1, "pages not gt 1")
 
     assertEquals(items, N)
 
@@ -319,4 +322,4 @@ console.error(">>>>>> page.Count", page.Count)
   }
 });
 
-runIfMain(import.meta, { only: /pagination/ });
+runIfMain(import.meta);

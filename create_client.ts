@@ -61,7 +61,7 @@ export const OPS: Set<string> = new Set([
 
 /** Base fetch. */
 async function baseFetch(conf: Document, op: string, query: Document): Promise<Document> {
-  console.error(">>>>>>>>>>>>> prep query", JSON.stringify(query), "\n")
+  // console.error(">>>>>>>>>>>>> prep query", JSON.stringify(query), "\n")
 
     const payload: Uint8Array = encode(JSON.stringify(query), "utf8");
     const headers: Headers = createHeaders({
@@ -96,8 +96,8 @@ async function baseOp(
   options: Document = {}
 ): Promise<Document> {
   let translator: any
-      console.error(">>>>>>>>>>> op", op)
-  console.error("\n>>>>>>>>>>>>> user query", JSON.stringify(query))
+      // console.error(">>>>>>>>>>> op", op)
+  // console.error("\n>>>>>>>>>>>>> user query", JSON.stringify(query))
   if (!options.raw) {
     /*
     options.attrValue =
@@ -156,7 +156,7 @@ async function baseOp(
 //   );
 
    let rawResult: Document = await baseFetch(conf, op, query)
-console.error(">>>>>>>>>>> rawResult.LastEvaluatedKey",rawResult.LastEvaluatedKey)
+// console.error(">>>>>>>>>>> rawResult.LastEvaluatedKey",rawResult.LastEvaluatedKey)
    if (rawResult.LastEvaluatedKey && options.iteratePages) {
      // TODO: return an async iterator over the pages -- outsource
      // let sawEOF: boolean = false
@@ -168,7 +168,7 @@ console.error(">>>>>>>>>>> rawResult.LastEvaluatedKey",rawResult.LastEvaluatedKe
          return this;
        },
        async next(): Promise<IteratorResult<Document>> {
-         console.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> NEXT")
+         // console.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> NEXT")
          // if (sawEof) {
          //   return { value: new Uint8Array(), done: true };
          // }
@@ -190,6 +190,8 @@ console.error(">>>>>>>>>>> rawResult.LastEvaluatedKey",rawResult.LastEvaluatedKe
         if (first) {
           first = false
 
+          lastEvaluatedKey = rawResult.LastEvaluatedKey
+
           if (options.raw) {
             return {
               value: rawResult,
@@ -198,7 +200,7 @@ console.error(">>>>>>>>>>> rawResult.LastEvaluatedKey",rawResult.LastEvaluatedKe
           } else {
             const outputShape: any = API.operations[op].output
             var result = translator.translateOutput(rawResult, outputShape)
-            console.error(">>>>>>>>>>> result", result)
+            // console.error(">>>>>>>>>>> result", result)
 
             return {
               value: result,
@@ -214,27 +216,27 @@ console.error(">>>>>>>>>>> rawResult.LastEvaluatedKey",rawResult.LastEvaluatedKe
          lastEvaluatedKey = rawResult.LastEvaluatedKey
 
          if (options.raw) {
-           return {value :rawResult, done: !lastEvaluatedKey}
+           return {value :rawResult, done: false}//!lastEvaluatedKey}
          }
 
          const outputShape: any = API.operations[op].output
          var result = translator.translateOutput(rawResult, outputShape)
-         console.error(">>>>>>>>>>> result", result)
-           return {value :result, done: !lastEvaluatedKey} // result
+         // console.error(">>>>>>>>>>> result", result)
+           return {value :result, done: false}// !lastEvaluatedKey} // result
        }
      };
    } else if (rawResult.LastEvaluatedKey && !options.iteratePages) {
      throw new Error(`response is paged but options.iteratePages is false`)
    }
 
-console.error(">>>>>>>>> rawResult", JSON.stringify(rawResult))
+// console.error(">>>>>>>>> rawResult", JSON.stringify(rawResult))
   if (options.raw) {
     return rawResult
   }
 
 const outputShape: any = API.operations[op].output
 var result = translator.translateOutput(rawResult, outputShape)
-console.error(">>>>>>>>>>> result", result)
+// console.error(">>>>>>>>>>> result", result)
   return result
 }
 
