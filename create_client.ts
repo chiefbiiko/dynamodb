@@ -59,6 +59,35 @@ export const OPS: Set<string> = new Set([
   "UpdateTimeToLive"
 ]);
 
+/** Base fetch. */
+async function baseFetch(conf: Document, op: string, query: Document): Promise<Document> {
+  console.error(">>>>>>>>>>>>> prep query", JSON.stringify(query), "\n")
+
+    const payload: Uint8Array = encode(JSON.stringify(query), "utf8");
+    const headers: Headers = createHeaders({
+      ...conf,
+      op,
+      method: conf.method,
+      payload
+    } as HeadersConfig);
+
+    return fetch(conf.endpoint, {
+      method: conf.method,
+      headers,
+      body: payload
+    }).then(
+      (response: Response): Document => {
+        console.error(">>>>>>> response.status", response.status," response.statusText", response.statusText)
+        // console.error(">>>>>>> response.statusText", response.statusText)
+        if (!response.ok) {
+          throw new Error(`http query request failed: ${response.status} ${response.statusText}`)
+        }
+
+        return response.json();
+      }
+    );
+}
+
 /** Base op. */
 async function baseOp(
   conf: Document,
@@ -96,33 +125,108 @@ async function baseOp(
     // console.error(">>>>>>>>>>>>>> TOTRANSLATE", JSON.stringify(toTranslate))
     // query = { ...query, ...translator.translateInput(toTranslate, inputShape).M }
     query = translator.translateInput(query, inputShape)
+  } else {
+    query = { ...query}
   }
 
-console.error(">>>>>>>>>>>>> prep query", JSON.stringify(query), "\n")
+// console.error(">>>>>>>>>>>>> prep query", JSON.stringify(query), "\n")
+//
+//   const payload: Uint8Array = encode(JSON.stringify(query), "utf8");
+//   const headers: Headers = createHeaders({
+//     ...conf,
+//     op,
+//     method: conf.method,
+//     payload
+//   } as HeadersConfig);
+//
+//   const rawResult: Document = await fetch(conf.endpoint, {
+//     method: conf.method,
+//     headers,
+//     body: payload
+//   }).then(
+//     (response: Response): Document => {
+//       console.error(">>>>>>> response.status", response.status," response.statusText", response.statusText)
+//       // console.error(">>>>>>> response.statusText", response.statusText)
+//       if (!response.ok) {
+//         throw new Error(`http query request failed: ${response.status} ${response.statusText}`)
+//       }
+//
+//       return response.json();
+//     }
+//   );
 
-  const payload: Uint8Array = encode(JSON.stringify(query), "utf8");
-  const headers: Headers = createHeaders({
-    ...conf,
-    op,
-    method: conf.method,
-    payload
-  } as HeadersConfig);
+   let rawResult: Document = await baseFetch(conf, op, query)
+console.error(">>>>>>>>>>> rawResult.LastEvaluatedKey",rawResult.LastEvaluatedKey)
+   if (rawResult.LastEvaluatedKey && options.iteratePages) {
+     // TODO: return an async iterator over the pages -- outsource
+     // let sawEOF: boolean = false
+     let lastEvaluatedKey: any = rawResult.LastEvaluatedKey
+     let first: boolean = true
 
-  const rawResult: Document = await fetch(conf.endpoint, {
-    method: conf.method,
-    headers,
-    body: payload
-  }).then(
-    (response: Response): Document => {
-      console.error(">>>>>>> response.status", response.status," response.statusText", response.statusText)
-      // console.error(">>>>>>> response.statusText", response.statusText)
-      // if (!response.ok) {
-      //   throw new Error("http query request failed")
-      // }
+     return {
+       [Symbol.asyncIterator](): AsyncIterableIterator<Document> {
+         return this;
+       },
+       async next(): Promise<IteratorResult<Document>> {
+         console.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> NEXT")
+         // if (sawEof) {
+         //   return { value: new Uint8Array(), done: true };
+         // }
+         //
+         // const result = await r.read(b);
+         // if (result === EOF) {
+         //   sawEof = true;
+         //   return { value: new Uint8Array(), done: true };
+         // }
+         //
+         // return {
+         //   value: b.subarray(0, result),
+         //   done: false
+         // };
+         if (!lastEvaluatedKey) {
+           return {value:{},done:true}
+         }
 
-      return response.json();
-    }
-  );
+        if (first) {
+          first = false
+
+          if (options.raw) {
+            return {
+              value: rawResult,
+              done: false
+            }
+          } else {
+            const outputShape: any = API.operations[op].output
+            var result = translator.translateOutput(rawResult, outputShape)
+            console.error(">>>>>>>>>>> result", result)
+
+            return {
+              value: result,
+              done: false
+            }
+          }
+        } else {
+              query.ExclusiveStartKey = lastEvaluatedKey
+        }
+
+         rawResult =  await baseFetch(conf, op, query)
+
+         lastEvaluatedKey = rawResult.LastEvaluatedKey
+
+         if (options.raw) {
+           return {value :rawResult, done: !lastEvaluatedKey}
+         }
+
+         const outputShape: any = API.operations[op].output
+         var result = translator.translateOutput(rawResult, outputShape)
+         console.error(">>>>>>>>>>> result", result)
+           return {value :result, done: !lastEvaluatedKey} // result
+       }
+     };
+   } else if (rawResult.LastEvaluatedKey && !options.iteratePages) {
+     throw new Error(`response is paged but options.iteratePages is false`)
+   }
+
 console.error(">>>>>>>>> rawResult", JSON.stringify(rawResult))
   if (options.raw) {
     return rawResult
