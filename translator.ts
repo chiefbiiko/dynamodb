@@ -3,11 +3,11 @@
 import { Document} from "./util.ts"
 import { Converter } from "./converter.ts";
 
-export function Translator(options:Document = {}) {
+export function Translator({wrapNumbers, convertEmptyValues, attrValue}:Document = {}) {
   // options = options || {};
-  this.attrValue = options.attrValue;
-  this.convertEmptyValues = Boolean(options.convertEmptyValues);
-  this.wrapNumbers = Boolean(options.wrapNumbers);
+  this.attrValue = attrValue;
+  this.convertEmptyValues = Boolean(convertEmptyValues);
+  this.wrapNumbers = Boolean(wrapNumbers);
 }
 
 Translator.prototype.translateInput = function(value:any, shape:any): any {
@@ -22,7 +22,7 @@ Translator.prototype.translateOutput = function(value:any, shape:any):any {
 
 Translator.prototype.translate = function(value: any, shape:any):any {
   const self: any = this;
-  
+
   if (!shape || value === undefined) {return undefined;}
 
   if (shape.shape === self.attrValue) {
@@ -31,7 +31,7 @@ Translator.prototype.translate = function(value: any, shape:any):any {
       wrapNumbers: self.wrapNumbers,
     });
   }
-  
+
   switch (shape.type) {
     case 'structure': return self.translateStructure(value, shape);
     case 'map': return self.translateMap(value, shape);
@@ -42,32 +42,32 @@ Translator.prototype.translate = function(value: any, shape:any):any {
 
 Translator.prototype.translateStructure = function(structure: any, shape:any): Document {
   const self: any = this;
-  
+
   if (structure == null){ return undefined;}
 
   const struct: Document = {};
   // util.each(structure, function(name, value) {
   Object.entries(structure).forEach(([name, value]: [string, any]): void =>{
     const memberShape: any = shape.members[name];
-    
+
     if (memberShape) {
       const result: any = self.translate(value, memberShape);
-      
+
       if (result !== undefined) {struct[name] = result;}
     }
   });
-  
+
   return struct;
 };
 
 Translator.prototype.translateList = function(list: any[], shape: any):any[] {
   const self:any = this;
-  
+
   if (list == null) {return undefined;}
 
   return list.map((value: any): any =>{
     const result:any = self.translate(value, shape.member);
-    
+
     if (result === undefined) {return null}
     else {return result}
   })
@@ -84,18 +84,18 @@ Translator.prototype.translateList = function(list: any[], shape: any):any[] {
 
 Translator.prototype.translateMap = function(map: Document, shape:any): Document {
   const self:any = this;
-  
+
   if (map == null){ return undefined;}
 
 return   Object.entries(map).reduce((acc: Document, [key, value]: [string, any]): Document => {
     const result: any = self.translate(value, shape.value);
-    
+
     if (result === undefined) {acc[key] = null;}
     else{ acc[key] = result;}
-    
+
     return acc
   }, {});
-  
+
   // var out = {};
   // // util.each(map, function(key, value) {
   // Object.entries(map).forEach(function([key, value]) {
