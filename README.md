@@ -29,11 +29,11 @@ const result = await ddbc.listTables();
 
 Creates a DynamoDB client.
 
-#### `DynamoDBClient#<Operation>(params?: Document, options?: OpOptions): Promise<Document>`
+### Ops
 
-Performs a DynamoDB operation.
+<OPS/>
 
-#### Basics
+### Basics
 
 ``` ts
 /** Generic document. */

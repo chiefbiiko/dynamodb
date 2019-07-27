@@ -72,6 +72,12 @@ export const OPS: Set<string> = new Set([
   "UpdateTimeToLive"
 ]);
 
+export const NO_PARAMS_OPS: Set<string> = new Set<string>([
+  "DescribeEndpoints",
+  "DescribeLimits",
+  "ListTables"
+])
+
 /** Base fetch. */
 function baseFetch(conf: Document, op: string, params: Document): Promise<Document> {
   // console.error(">>>>>>>>>>>>> prep query", JSON.stringify(query), "\n")
@@ -111,7 +117,7 @@ async function baseOp(
   convertEmptyValues = false,
   translateJSON = true,
   iteratePages= true
-}: OpOptions = {}
+}: OpOptions = NO_PARAMS_OPS.has(op) ? params : {}
 ): Promise<Document> {
   let translator: any
   //     console.error(">>>>>>>>>>> op", op)
