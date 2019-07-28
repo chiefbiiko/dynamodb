@@ -12,6 +12,11 @@ export { Document } from "./util.ts";
 
 /** Generic representation of a DynamoDB client. */
 export interface DynamoDBClient {
+  describeEndpoints: (options?: Document) => Promise<Document>;
+  describeLimits: (options?: Document) => Promise<Document>;
+  listTables: (options?: Document) => Promise<Document>;
+  scan: (params?: Document, options?: Document) => Promise<Document | AsyncIterableIterator<Document>>;
+  query: (params?: Document, options?: Document) => Promise<Document | AsyncIterableIterator<Document>>;
   [key: string]: (params?: Document, options?: Document) => Promise<Document>;
 }
 
@@ -117,7 +122,7 @@ async function baseOp(
   convertEmptyValues = false,
   translateJSON = true,
   iteratePages= true
-}: OpOptions = NO_PARAMS_OPS.has(op) ? params : {}
+}: OpOptions = NO_PARAMS_OPS.has(op) ? params || {} : {}
 ): Promise<Document> {
   let translator: any
   //     console.error(">>>>>>>>>>> op", op)
@@ -287,7 +292,7 @@ export function createClient(conf: ClientConfig): DynamoDBClient {
 
   const _conf: Document = { ...conf, host, method, endpoint };
 
-  const ddbc: DynamoDBClient = {};
+  const ddbc: DynamoDBClient = {} as DynamoDBClient;
 
   for (const op of OPS) {
     const camelCaseOp: string = `${op[0].toLowerCase()}${op.slice(1)}`;
