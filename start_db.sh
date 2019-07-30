@@ -5,10 +5,8 @@ DIR="./dynamodb_local_latest"
 TARBALL="$DIR.tar.gz"
 
 if [[ ! -d $DIR ]]; then
-  mkdir -p "$DIR/third_party_licenses" "$DIR/DynamoDBLocal_lib"
-  curl "$ENDPOINT/$TARBALL" | tar zxf -C=$DIR - 
+  mkdir $DIR
+  curl --progress-bar "$ENDPOINT/$TARBALL" | tar --directory=$DIR -zxf - 
 fi
 
 java -D"java.library.path=$DIR/DynamoDBLocal_lib" -jar "$DIR/DynamoDBLocal.jar" -sharedDb
-
-sleep 5
