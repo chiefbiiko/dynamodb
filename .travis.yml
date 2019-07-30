@@ -1,0 +1,9 @@
+language: minimal
+
+os:
+  - linux
+  - osx
+
+before_script: curl -sL https://deno.land/x/install/install.sh | sh
+
+script: $HOME/.deno/bin/deno run --allow-read=$(pwd) --allow-env ./test.ts
