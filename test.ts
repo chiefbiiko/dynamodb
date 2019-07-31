@@ -407,4 +407,4 @@ test({
   }
 });
 
-runIfMain(import.meta, { skip: /aws/});
+runIfMain(import.meta);
