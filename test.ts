@@ -2,7 +2,11 @@ import { test, runIfMain } from "https://deno.land/std/testing/mod.ts";
 
 import { assert, assertEquals } from "https://deno.land/std/testing/asserts.ts";
 
+import { encode} from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
+
 import { Document } from "./util.ts";
+
+import { awsv4signature } from "./awsv4signature.ts";
 
 import { ClientConfig, DynamoDBClient, createClient } from "./mod.ts";
 
@@ -13,6 +17,29 @@ const CONF: ClientConfig = {
   secretAccessKey: ENV.SECRET_ACCESS_KEY,
   region: "local"
 };
+
+test({
+  name: "awsv4signature",
+  fn(): void {
+    const ALGORITHM: string = "AWS4-HMAC-SHA256";
+    const amzDate: string = "20150830T123600Z";
+    const credentialScope: string = "AKIDEXAMPLE/20150830/us-east-1/service/aws4_request";
+    const canonicalRequestDigest: string  ="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+
+    const msg: Uint8Array = encode(
+      `${ALGORITHM}\n${amzDate}\n${credentialScope}\n${canonicalRequestDigest}`,
+      "utf8"
+    );
+
+    const signingKey: string = "wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY";
+
+    const expectedSignature: string = "5da7c1a2acd57cee7505fc6676e4e544621c30862966e37dddb68e92efbe5d6b";
+
+    const actualSignature: string = awsv4signature(signingKey, msg, "hex");
+
+    assertEquals(actualSignature, expectedSignature);
+  }
+});
 
 test({
   name: "js <-> query schema translation enabled by default",
@@ -380,4 +407,4 @@ test({
   }
 });
 
-runIfMain(import.meta);
+runIfMain(import.meta, { skip: /aws/});

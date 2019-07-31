@@ -226,8 +226,6 @@ async function baseOp(
            return {value :result, done: false}// !lastEvaluatedKey} // result
        }
      };
-   } else if (rawResult.LastEvaluatedKey && !options.iteratePages) {
-     throw new Error(`response is paged but options.iteratePages is false`)
    }
 
 // console.error(">>>>>>>>> rawResult", JSON.stringify(rawResult))
