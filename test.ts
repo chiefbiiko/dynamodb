@@ -6,7 +6,7 @@ import { encode} from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
 
 import { Document } from "./util.ts";
 
-import { awsv4signature } from "./awsv4signature.ts";
+import { awsv4Signature } from "./awsv4signature.ts";
 
 import { ClientConfig, DynamoDBClient, createClient } from "./mod.ts";
 
@@ -31,11 +31,11 @@ test({
       "utf8"
     );
 
-    const signingKey: string = "wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY";
+    const signingKey: Uint8Array = encode("wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY", "utf8");
 
     const expectedSignature: string = "5da7c1a2acd57cee7505fc6676e4e544621c30862966e37dddb68e92efbe5d6b";
 
-    const actualSignature: string = awsv4signature(signingKey, msg, "hex");
+    const actualSignature: string = awsv4Signature(signingKey, msg, "hex") as string;
 
     assertEquals(actualSignature, expectedSignature);
   }
