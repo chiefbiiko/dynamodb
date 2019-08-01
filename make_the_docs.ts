@@ -134,9 +134,9 @@ const { contents, ops }: Document = Array.from(OPS)
     },
     {
       contents: [
-        " + [Basics](#Basics)\n\n",
-        " + [Factory](#Factory)\n\n",
-        " + [Ops](#Ops)\n\n"
+        "1. [Basics](#Basics)\n\n",
+        "2. [Factory](#Factory)\n\n",
+        "3. [Ops](#Ops)\n\n"
       ].concat(new Array(OPS.size)),
       ops: new Array(OPS.size)
     }

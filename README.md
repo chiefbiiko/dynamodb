@@ -28,11 +28,11 @@ const result = await ddbc.listTables();
 
 ### Contents
 
- + [Basics](#Basics)
+1. [Basics](#Basics)
 
- + [Factory](#Factory)
+2. [Factory](#Factory)
 
- + [Ops](#Ops)
+3. [Ops](#Ops)
 
   + [BatchGetItem](#BatchGetItem)
 
