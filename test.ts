@@ -23,8 +23,8 @@ test({
   fn(): void {
     const ALGORITHM: string = "AWS4-HMAC-SHA256";
     const amzDate: string = "20150830T123600Z";
-    const credentialScope: string = "AKIDEXAMPLE/20150830/us-east-1/service/aws4_request";
-    const canonicalRequestDigest: string  ="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+    const credentialScope: string = "20150830/us-east-1/service/aws4_request";
+    const canonicalRequestDigest: string  ="816cd5b414d056048ba4f7c5386d6e0533120fb1fcfa93762cf0fc39e2cf19e0";
 
     const msg: Uint8Array = encode(
       `${ALGORITHM}\n${amzDate}\n${credentialScope}\n${canonicalRequestDigest}`,
@@ -33,7 +33,7 @@ test({
 
     const signingKey: Uint8Array = encode("wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY", "utf8");
 
-    const expectedSignature: string = "5da7c1a2acd57cee7505fc6676e4e544621c30862966e37dddb68e92efbe5d6b";
+    const expectedSignature: string = "b97d918cfa904a5beff61c982a1b6f458b799221646efd99d3219ec94cdf2500";
 
     const actualSignature: string = awsv4Signature(signingKey, msg, "hex") as string;
 
@@ -46,9 +46,9 @@ test({
   async fn(): Promise<void> {
     const ddbc: DynamoDBClient = createClient(CONF);
 
-    let response: Document = await ddbc.listTables();
+    let result: Document = await ddbc.listTables();
 
-    if (!response.TableNames.includes("users_b")) {
+    if (!result.TableNames.includes("users_b")) {
       await ddbc.createTable({
        TableName: "users_b",
        KeySchema: [{ KeyType: "HASH", AttributeName: "id" }],
@@ -59,27 +59,27 @@ test({
 
     const friends: string[] = ["djb", "devil", "donkey kong"];
 
-    response = await ddbc.putItem({
+    result = await ddbc.putItem({
       TableName: "users_b",
       Item: { id: "abc", friends }
     });
 
-    response = await ddbc.getItem({
+    result = await ddbc.getItem({
       TableName: "users_b",
       Key: { id: "abc" }
     });
 
-    assertEquals(response.Item.friends, friends);
+    assertEquals(result.Item.friends, friends);
 
-    response = await ddbc.deleteTable({
+    result = await ddbc.deleteTable({
       TableName: "users_b"
     });
 
-    assertEquals(response.TableDescription.TableName, "users_b");
+    assertEquals(result.TableDescription.TableName, "users_b");
 
-    response = await ddbc.listTables();
+    result = await ddbc.listTables();
 
-    assert(!response.TableNames.includes("users_b"));
+    assert(!result.TableNames.includes("users_b"));
   }
 });
 
@@ -88,9 +88,9 @@ test({
   async fn(): Promise<void> {
     const ddbc: DynamoDBClient = createClient(CONF);
 
-    let response: Document = await ddbc.listTables();
+    let result: Document = await ddbc.listTables();
 
-    if (!response.TableNames.includes("users_a")) {
+    if (!result.TableNames.includes("users_a")) {
       await ddbc.createTable(
         {
           TableName: "users_a",
@@ -102,7 +102,7 @@ test({
       );
     }
 
-    response = await ddbc.putItem(
+    result = await ddbc.putItem(
       {
         TableName: "users_a",
         Item: { id: { S: "abc" }, role: { S: "admin" } }
@@ -110,9 +110,9 @@ test({
       { translateJSON: false }
     );
 
-    assertEquals(response, {});
+    assertEquals(result, {});
 
-    response = await ddbc.getItem(
+    result = await ddbc.getItem(
       {
         TableName: "users_a",
         Key: { id: { S: "abc" } }
@@ -120,9 +120,9 @@ test({
       { translateJSON: false }
     );
 
-    assertEquals(response.Item.role.S, "admin");
+    assertEquals(result.Item.role.S, "admin");
 
-    response = await ddbc.deleteItem(
+    result = await ddbc.deleteItem(
       {
         TableName: "users_a",
         Key: { id: { S: "abc" } }
@@ -130,20 +130,20 @@ test({
       { translateJSON: false }
     );
 
-    assertEquals(response, {});
+    assertEquals(result, {});
 
-    response = await ddbc.deleteTable(
+    result = await ddbc.deleteTable(
       {
         TableName: "users_a"
       },
       { translateJSON: false }
     );
 
-    assertEquals(response.TableDescription.TableName, "users_a");
+    assertEquals(result.TableDescription.TableName, "users_a");
 
-    response = await ddbc.listTables();
+    result = await ddbc.listTables();
 
-    assert(!response.TableNames.includes("users_a"));
+    assert(!result.TableNames.includes("users_a"));
   }
 });
 
@@ -152,9 +152,9 @@ test({
   async fn(): Promise<void> {
     const ddbc: DynamoDBClient = createClient(CONF);
 
-    let response: Document = await ddbc.listTables();
+    let result: Document = await ddbc.listTables();
 
-    if (!response.TableNames.includes("users_c")) {
+    if (!result.TableNames.includes("users_c")) {
       await ddbc.createTable({
         TableName: "users_c",
         KeySchema: [{ KeyType: "HASH", AttributeName: "id" }],
@@ -179,26 +179,26 @@ test({
       };
     }
 
-    response = await ddbc.batchWriteItem(params);
+    result = await ddbc.batchWriteItem(params);
 
-    assertEquals(Object.keys(response.UnprocessedItems).length, 0);
+    assertEquals(Object.keys(result.UnprocessedItems).length, 0);
 
-    response = await ddbc.scan({
+    result = await ddbc.scan({
       TableName: "users_c",
       Select: "COUNT"
     });
 
-    assertEquals(response.Count, N);
+    assertEquals(result.Count, N);
 
-    response = await ddbc.deleteTable({
+    result = await ddbc.deleteTable({
       TableName: "users_c"
     });
 
-    assertEquals(response.TableDescription.TableName, "users_c");
+    assertEquals(result.TableDescription.TableName, "users_c");
 
-    response = await ddbc.listTables();
+    result = await ddbc.listTables();
 
-    assert(!response.TableNames.includes("users_c"));
+    assert(!result.TableNames.includes("users_c"));
   }
 });
 
@@ -207,9 +207,9 @@ test({
   async fn(): Promise<void> {
     const ddbc: DynamoDBClient = createClient(CONF);
 
-    let response: Document = await ddbc.listTables();
+    let result: Document = await ddbc.listTables();
 
-    if (!response.TableNames.includes("users_d")) {
+    if (!result.TableNames.includes("users_d")) {
       await ddbc.createTable({
         TableName: "users_d",
         KeySchema: [{ KeyType: "HASH", AttributeName: "id" }],
@@ -220,47 +220,47 @@ test({
 
     const buf: Uint8Array = new TextEncoder().encode("deadbeefdeadbeef");
 
-    response = await ddbc.putItem({
+    result = await ddbc.putItem({
       TableName: "users_d",
       Item: { id: "abc", buf }
     });
 
-    assertEquals(response, {});
+    assertEquals(result, {});
 
-    response = await ddbc.getItem({
+    result = await ddbc.getItem({
       TableName: "users_d",
       Key: { id: "abc" }
     });
 
-    assertEquals(response.Item.buf, buf);
+    assertEquals(result.Item.buf, buf);
 
-    response = await ddbc.deleteItem({
+    result = await ddbc.deleteItem({
       TableName: "users_d",
       Key: { id: "abc" }
     });
 
-    assertEquals(response, {});
+    assertEquals(result, {});
 
-    response = await ddbc.deleteTable({
+    result = await ddbc.deleteTable({
       TableName: "users_d"
     });
 
-    assertEquals(response.TableDescription.TableName, "users_d");
+    assertEquals(result.TableDescription.TableName, "users_d");
 
-    response = await ddbc.listTables();
+    result = await ddbc.listTables();
 
-    assert(!response.TableNames.includes("users_d"));
+    assert(!result.TableNames.includes("users_d"));
   }
 });
 
 test({
-  name: "ops that receive paged responses return an async iterator by default",
+  name: "ops that receive paged results return an async iterator by default",
   async fn(): Promise<void> {
     const ddbc: DynamoDBClient = createClient(CONF);
 
-    let response: Document = await ddbc.listTables();
+    let result: Document = await ddbc.listTables();
 
-    if (!response.TableNames.includes("users_e")) {
+    if (!result.TableNames.includes("users_e")) {
       await ddbc.createTable({
         TableName: "users_e",
         KeySchema: [{ KeyType: "HASH", AttributeName: "id" }],
@@ -296,11 +296,11 @@ test({
     // 20 * n items each gt 4096 bytes
     const batches: Promise<Document>[] = new Array(20).fill(null).map(batch);
 
-    const responses: Document[] = await Promise.all(batches);
+    const results: Document[] = await Promise.all(batches);
 
-    const unprocessed: number = responses.reduce(
-      (acc: number, response: Document): number =>
-        acc + Object.keys(response.UnprocessedItems).length,
+    const unprocessed: number = results.reduce(
+      (acc: number, result: Document): number =>
+        acc + Object.keys(result.UnprocessedItems).length,
       0
     );
 
@@ -312,27 +312,26 @@ test({
     let items: number = 0
 
     for await (const page of ait) {
+            assert(Array.isArray(page.Items))
+            assert(page.Items.length > 0)
+            
       ++pages
-
       items += page.Count
-
-      assert(Array.isArray(page.Items))
-      assert(page.Items.length > 0)
     }
 
     assertEquals(pages, 2)
 
     assertEquals(items, N)
 
-    response = await ddbc.deleteTable({
+    result = await ddbc.deleteTable({
       TableName: "users_e"
     });
 
-    assertEquals(response.TableDescription.TableName, "users_e");
+    assertEquals(result.TableDescription.TableName, "users_e");
 
-    response = await ddbc.listTables();
+    result = await ddbc.listTables();
 
-    assert(!response.TableNames.includes("users_e"));
+    assert(!result.TableNames.includes("users_e"));
   }
 });
 
@@ -341,9 +340,9 @@ test({
   async fn(): Promise<void> {
     const ddbc: DynamoDBClient = createClient(CONF);
 
-    let response: Document = await ddbc.listTables();
+    let result: Document = await ddbc.listTables();
 
-    if (!response.TableNames.includes("users_f")) {
+    if (!result.TableNames.includes("users_f")) {
       await ddbc.createTable({
         TableName: "users_f",
         KeySchema: [{ KeyType: "HASH", AttributeName: "id" }],
@@ -378,33 +377,33 @@ test({
     // 20 * n items each gt 4096 bytes
     const batches: Promise<Document>[] = new Array(20).fill(null).map(batch);
 
-    const responses: Document[] = await Promise.all(batches);
+    const results: Document[] = await Promise.all(batches);
 
-    const unprocessed: number = responses.reduce(
-      (acc: number, response: Document): number =>
-        acc + Object.keys(response.UnprocessedItems).length,
+    const unprocessed: number = results.reduce(
+      (acc: number, result: Document): number =>
+        acc + Object.keys(result.UnprocessedItems).length,
       0
     );
 
     assertEquals(unprocessed, 0);
 
-     // only fetching 1 document - not async iterating
-     response= await  ddbc.scan({ TableName: "users_f" }, { iteratePages: false})
+     // only fetching 1 page - not async iterating
+     result= await  ddbc.scan({ TableName: "users_f" }, { iteratePages: false})
 
-     assert(Array.isArray(response.Items))
-     assert(response.Items.length > 0)
-     assert(!!response.LastEvaluatedKey)
+     assert(Array.isArray(result.Items))
+     assert(result.Items.length > 0)
+     assert(!!result.LastEvaluatedKey)
 
-    response = await ddbc.deleteTable({
+    result = await ddbc.deleteTable({
       TableName: "users_f"
     });
 
-    assertEquals(response.TableDescription.TableName, "users_f");
+    assertEquals(result.TableDescription.TableName, "users_f");
 
-    response = await ddbc.listTables();
+    result = await ddbc.listTables();
 
-    assert(!response.TableNames.includes("users_f"));
+    assert(!result.TableNames.includes("users_f"));
   }
 });
 
-runIfMain(import.meta);
+runIfMain(import.meta, { only: /aws/ });
