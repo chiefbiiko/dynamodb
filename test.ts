@@ -22,18 +22,18 @@ test({
   name: "awsv4signature",
   fn(): void {
     const ALGORITHM: string = "AWS4-HMAC-SHA256";
-    const amzDate: string = "20150830T123600Z";
-    const credentialScope: string = "20150830/us-east-1/service/aws4_request";
-    const canonicalRequestDigest: string  ="816cd5b414d056048ba4f7c5386d6e0533120fb1fcfa93762cf0fc39e2cf19e0";
+    const amzDate: string = "20130524T000000Z";
+    const credentialScope: string = "20130524/us-east-1/s3/aws4_request";
+    const canonicalRequestDigest: string  ="880b4f43ad1543b67d0161eefb6862247889e047940e7ef9a4ab94b2f3d439c1";
 
     const msg: Uint8Array = encode(
       `${ALGORITHM}\n${amzDate}\n${credentialScope}\n${canonicalRequestDigest}`,
       "utf8"
     );
 
-    const signingKey: Uint8Array = encode("wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY", "utf8");
+    const signingKey: Uint8Array = encode("wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY", "utf8");
 
-    const expectedSignature: string = "b97d918cfa904a5beff61c982a1b6f458b799221646efd99d3219ec94cdf2500";
+    const expectedSignature: string = "1afc454faab3be4f9f055263641532b5594b0430b8f639cfc78803252b32a575";
 
     const actualSignature: string = awsv4Signature(signingKey, msg, "hex") as string;
 
