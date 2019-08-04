@@ -6,7 +6,7 @@ import { encode} from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
 
 import { Document } from "./util.ts";
 
-import { awsv4Signature } from "./awsv4signature.ts";
+import { awsSignatureV4, kdf } from "./aws_signature_v4.ts";
 
 import { ClientConfig, DynamoDBClient, createClient } from "./mod.ts";
 
@@ -19,30 +19,22 @@ const CONF: ClientConfig = {
 };
 
 test({
-  name: "awsv4signature",
+  name: "aws signature v4 flow",
   fn(): void {
-    const ALGORITHM: string = "AWS4-HMAC-SHA256";
-    const amzDate: string = "20130524T000000Z";
-    const credentialScope: string = "20130524/us-east-1/s3/aws4_request";
-    const canonicalRequestDigest: string  ="880b4f43ad1543b67d0161eefb6862247889e047940e7ef9a4ab94b2f3d439c1";
+    const expectedSignature: string = "31fac5ed29db737fbcafac527470ca6d9283283197c5e6e94ea40ddcec14a9c1";
+    
+    const signingKey: Uint8Array = kdf("secret", "20310430", "region", "dynamodb", "utf8") as Uint8Array;
+    
+    const msg: Uint8Array = encode("AWS4-HMAC-SHA256\n20310430T201613Z\n20310430/region/dynamodb/aws4_request\n4be20e7bf75dc6c7e93873b5f49096771729b8a28f0c62010db431fea79220ef", "utf8");
 
-    const msg: Uint8Array = encode(
-      `${ALGORITHM}\n${amzDate}\n${credentialScope}\n${canonicalRequestDigest}`,
-      "utf8"
-    );
-
-    const signingKey: Uint8Array = encode("wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY", "utf8");
-
-    const expectedSignature: string = "1afc454faab3be4f9f055263641532b5594b0430b8f639cfc78803252b32a575";
-
-    const actualSignature: string = awsv4Signature(signingKey, msg, "hex") as string;
+    const actualSignature: string = awsSignatureV4(signingKey, msg, "hex") as string;
 
     assertEquals(actualSignature, expectedSignature);
   }
 });
 
 test({
-  name: "js <-> query schema translation enabled by default",
+  name: "schema translation enabled by default",
   async fn(): Promise<void> {
     const ddbc: DynamoDBClient = createClient(CONF);
 
@@ -84,7 +76,7 @@ test({
 });
 
 test({
-  name: "raw queries",
+  name: "opt-in raw queries",
   async fn(): Promise<void> {
     const ddbc: DynamoDBClient = createClient(CONF);
 
@@ -406,4 +398,4 @@ test({
   }
 });
 
-runIfMain(import.meta, { only: /aws/ });
+runIfMain(import.meta);

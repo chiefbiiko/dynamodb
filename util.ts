@@ -171,7 +171,7 @@ export class DynamoDBNumberValue {
 
 /** Date format helpers. */
 export const date: Document = {
-  /** Date stamp format as expected by awsv4SignatureKDF. */
+  /** Date stamp format as expected by awsSignatureV4KDF. */
  DATE_STAMP_REGEX: /^\d{8}$/,
   amz(date: Date): string {
     return `${date

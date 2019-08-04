@@ -1,6 +1,6 @@
 import { sha256 } from "https://denopkg.com/chiefbiiko/sha256/mod.ts";
 import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
-import { awsv4Signature, kdf } from "./awsv4signature.ts";
+import { awsSignatureV4, kdf } from "./aws_signature_v4.ts";
 import { Document, date } from "./util.ts";
 import { ClientConfig } from "./mod.ts";
 
@@ -104,7 +104,7 @@ export function createHeaders(conf: HeadersConfig): Headers {
   //   SERVICE
   // ) as Uint8Array;
 
-  const signature: string = awsv4Signature(cache.key,msg, "hex") as string
+  const signature: string = awsSignatureV4(cache.key,msg, "hex") as string
 
   const authorizationHeader: string = `${ALGORITHM} Credential=${
     conf.accessKeyId
