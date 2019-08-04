@@ -1,6 +1,6 @@
 import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
-import { HeadersConfig, createHeaders } from "./create_headers.ts";
-import { Translator } from "./translator.ts";
+import { HeadersConfig, createHeaders } from "./client/create_headers.ts";
+import { Translator } from "./client/translator.ts";
 import { Document } from "./util.ts";
 import { API } from "./api/mod.ts"
 

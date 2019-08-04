@@ -6,7 +6,7 @@ import { encode} from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
 
 import { Document } from "./util.ts";
 
-import { awsSignatureV4, kdf } from "./aws_signature_v4.ts";
+import { awsSignatureV4, kdf } from "./client/aws_signature_v4.ts";
 
 import { ClientConfig, DynamoDBClient, createClient } from "./mod.ts";
 

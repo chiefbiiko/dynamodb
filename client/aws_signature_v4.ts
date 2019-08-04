@@ -5,7 +5,7 @@ import {
 
 import { hmac } from "https://denopkg.com/chiefbiiko/hmac/mod.ts";
 
-import { date } from "./util.ts";
+import { date } from "./../util.ts";
 
 /** Some magic bytes. */
 const AWS4: Uint8Array = encode("AWS4", "utf8");

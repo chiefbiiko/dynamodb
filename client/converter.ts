@@ -1,7 +1,7 @@
 // import DynamoDB = require('../../clients/dynamodb');
 import { toUint8Array as base64ToUint8Array, fromUint8Array as base64FromUint8Array} from "https://deno.land/x/base64/mod.ts"
 
-import {Document, DynamoDBSet, DynamoDBNumberValue, typeOf} from "./util.ts"
+import {Document, DynamoDBSet, DynamoDBNumberValue, typeOf} from "./../util.ts"
 
 /** Formats a list. */
 function formatList(data: any[], options: Document={}): Document {

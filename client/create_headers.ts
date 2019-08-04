@@ -1,8 +1,8 @@
 import { sha256 } from "https://denopkg.com/chiefbiiko/sha256/mod.ts";
 import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
 import { awsSignatureV4, kdf } from "./aws_signature_v4.ts";
-import { Document, date } from "./util.ts";
-import { ClientConfig } from "./mod.ts";
+import { Document, date } from "./../util.ts";
+import { ClientConfig } from "./../mod.ts";
 
 /** Service name. */
 const SERVICE: string = "dynamodb";
