@@ -1,11 +1,11 @@
 // import DynamoDB = require('../../clients/dynamodb');
 import { toUint8Array as base64ToUint8Array, fromUint8Array as base64FromUint8Array} from "https://deno.land/x/base64/mod.ts"
 
-import {Document, DynamoDBSet, DynamoDBNumberValue, typeOf} from "./../util.ts"
+import {Doc, DynamoDBSet, DynamoDBNumberValue, typeOf} from "./../util.ts"
 
 /** Formats a list. */
-function formatList(data: any[], options: Document={}): Document {
-  const list: Document = {L: []};
+function formatList(data: any[], options: Doc={}): Doc {
+  const list: Doc = {L: []};
 
   for (let i: number = 0; i < data.length; i++) {
     list['L'].push(Converter.input(data[i], options));
@@ -20,11 +20,11 @@ function convertNumber(value: string, wrapNumbers: boolean = false): any {
 }
 
 /** Formats a map. */
-function formatMap(data: Document, options: Document = {}): Document {
-  const map:Document = {M: {}};
+function formatMap(data: Doc, options: Doc = {}): Doc {
+  const map:Doc = {M: {}};
 
   for (const key in data) {
-    const formatted: Document = Converter.input(data[key], options);
+    const formatted: Doc = Converter.input(data[key], options);
 
     if (formatted !== void 0) {
       map['M'][key] = formatted;
@@ -35,7 +35,7 @@ function formatMap(data: Document, options: Document = {}): Document {
 }
 
 /** Formats a set. */
-function formatSet(data: Document, options: Document = {}): Document {
+function formatSet(data: Doc, options: Doc = {}): Doc {
   let values: any[] = data.values;
 
   if (options.convertEmptyValues) {
@@ -46,7 +46,7 @@ function formatSet(data: Document, options: Document = {}): Document {
     }
   }
 
-  const map:Document = {};
+  const map:Doc = {};
 
   switch (data.type) {
     case 'String': map['SS'] = values; break;
@@ -60,10 +60,10 @@ function formatSet(data: Document, options: Document = {}): Document {
 }
 
 /** Filters empty set values. */
-function filterEmptySetValues(set: Document): any[] {
+function filterEmptySetValues(set: Doc): any[] {
     const nonEmptyValues: any[] = [];
 
-    const potentiallyEmptyTypes:Document = {
+    const potentiallyEmptyTypes:Doc = {
         String: true,
         Binary: true,
         Number: false
@@ -106,7 +106,7 @@ export class Converter {
  * @see AWS.DynamoDB.Converter.marshall AWS.DynamoDB.Converter.marshall to
  *    convert entire records (rather than individual attributes)
  */
-    static input( data: any, options: Document= {} ): Document {
+    static input( data: any, options: Doc= {} ): Doc {
       const  type:string = typeOf(data);
 
       if (type === 'Object') {
@@ -170,7 +170,7 @@ export class Converter {
      *    stringSet: new DynamoDBSet(['foo', 'bar', 'baz'])
      *  });
      */
-    static marshall( data: Document, options?: Document ): Document {
+    static marshall( data: Doc, options?: Doc ): Doc {
       return Converter.input(data, options).M;
     }
 
@@ -194,12 +194,12 @@ export class Converter {
      * @see AWS.DynamoDB.Converter.unmarshall AWS.DynamoDB.Converter.unmarshall to
      *    convert entire records (rather than individual attributes)
      */
-    static output( data: Document, options: Document = {} ): any {
+    static output( data: Doc, options: Doc = {} ): any {
       for (const type in data) {
        const values: any = data[type];
 
         if (type === 'M') {
-          const map: Document = {};
+          const map: Doc = {};
 
           for (const key in values) {
             map[key] = Converter.output(values[key], options);
@@ -285,7 +285,7 @@ export class Converter {
      *    boolValue: {BOOL: true}
      *  });
      */
-    static unmarshall( data: Document, options?: Document ): Document {
+    static unmarshall( data: Doc, options?: Doc ): Doc {
      return Converter.output({M: data}, options);
     };
 }

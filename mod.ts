@@ -1,23 +1,23 @@
 import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
 import { HeadersConfig, createHeaders } from "./client/create_headers.ts";
 import { Translator } from "./client/translator.ts";
-import { Document } from "./util.ts";
+import { Doc } from "./util.ts";
 import { API } from "./api/mod.ts"
 
 /** Base shape of all DynamoDB query schemas. */
 const ATTR_VALUE: string = API.operations.PutItem.input.members.Item.value.shape;
 
 /** Convenience export. */
-export { Document } from "./util.ts";
+export { Doc } from "./util.ts";
 
 /** Generic representation of a DynamoDB client. */
 export interface DynamoDBClient {
-  describeEndpoints: (options?: Document) => Promise<Document>;
-  describeLimits: (options?: Document) => Promise<Document>;
-  listTables: (options?: Document) => Promise<Document>;
-  scan: (params?: Document, options?: Document) => Promise<Document | AsyncIterableIterator<Document>>;
-  query: (params?: Document, options?: Document) => Promise<Document | AsyncIterableIterator<Document>>;
-  [key: string]: (params?: Document, options?: Document) => Promise<Document>;
+  describeEndpoints: (options?: Doc) => Promise<Doc>;
+  describeLimits: (options?: Doc) => Promise<Doc>;
+  listTables: (options?: Doc) => Promise<Doc>;
+  scan: (params?: Doc, options?: Doc) => Promise<Doc | AsyncIterableIterator<Doc>>;
+  query: (params?: Doc, options?: Doc) => Promise<Doc | AsyncIterableIterator<Doc>>;
+  [key: string]: (params?: Doc, options?: Doc) => Promise<Doc>;
 }
 
 /** Client configuration. */
@@ -38,7 +38,7 @@ export interface OpOptions {
 }
 
 /** DynamoDB operations. */
-export const OPS: Set<string> = new Set([
+export const OPS: Set<string> = new Set<string>([
   "BatchGetItem",
   "BatchWriteItem",
   "CreateBackup",
@@ -84,7 +84,7 @@ export const NO_PARAMS_OPS: Set<string> = new Set<string>([
 ])
 
 /** Base fetch. */
-function baseFetch(conf: Document, op: string, params: Document): Promise<Document> {
+function baseFetch(conf: Doc, op: string, params: Doc): Promise<Doc> {
   // console.error(">>>>>>>>>>>>> prep query", JSON.stringify(query), "\n")
 
     const payload: Uint8Array = encode(JSON.stringify(params), "utf8");
@@ -100,7 +100,7 @@ function baseFetch(conf: Document, op: string, params: Document): Promise<Docume
       headers,
       body: payload
     }).then(
-     (response: Response): Document => {
+     (response: Response): Doc => {
         // console.error(">>>>>>> op response.status",op,  response.status," response.statusText", response.statusText)
         // console.error(">>>>>>> response.statusText", response.statusText)
         if (!response.ok) {
@@ -115,15 +115,15 @@ function baseFetch(conf: Document, op: string, params: Document): Promise<Docume
 
 /** Base op. */
 async function baseOp(
-  conf: Document,
+  conf: Doc,
   op: string,
-  params: Document = {},
+  params: Doc = {},
   { wrapNumbers= false,
   convertEmptyValues = false,
   translateJSON = true,
   iteratePages= true
 }: OpOptions = NO_PARAMS_OPS.has(op) ? params || {} : {}
-): Promise<Document> {
+): Promise<Doc> {
   let translator: any
   //     console.error(">>>>>>>>>>> op", op)
   // console.error("\n>>>>>>>>>>>>> user query", JSON.stringify(query))
@@ -143,9 +143,9 @@ async function baseOp(
     outputShape = API.operations[op].output
     // TODO
     // var preserve = {}
-    // const preserve: Document = //{}
+    // const preserve: Doc = //{}
     // for each inputShape.members prop if value == empty object then preserve[key] = value
-    // const toTranslate: Document =  Object.entries(inputShape.members).reduce((acc: Document, [key, value]: [string, string]): Document => {
+    // const toTranslate: Doc =  Object.entries(inputShape.members).reduce((acc: Doc, [key, value]: [string, string]): Doc => {
     //   console.error(">>>>>>>>> CHECK", key)
     //   if (key === "Key" || key === "Item") {
     //     console.log(">>>>>>>>>>>>> translateE KEY", key)
@@ -171,12 +171,12 @@ async function baseOp(
 //     payload
 //   } as HeadersConfig);
 //
-//   const rawResult: Document = await fetch(conf.endpoint, {
+//   const rawResult: Doc = await fetch(conf.endpoint, {
 //     method: conf.method,
 //     headers,
 //     body: payload
 //   }).then(
-//     (response: Response): Document => {
+//     (response: Response): Doc => {
 //       console.error(">>>>>>> response.status", response.status," response.statusText", response.statusText)
 //       // console.error(">>>>>>> response.statusText", response.statusText)
 //       if (!response.ok) {
@@ -187,7 +187,7 @@ async function baseOp(
 //     }
 //   );
 
-   let rawResult: Document = await baseFetch(conf, op, params)
+   let rawResult: Doc = await baseFetch(conf, op, params)
 // console.error(">>>>>>>>>>> rawResult.LastEvaluatedKey",rawResult.LastEvaluatedKey)
    if (rawResult.LastEvaluatedKey && iteratePages) {
      // TODO: return an async iterator over the pages -- outsource
@@ -196,10 +196,10 @@ async function baseOp(
      let first: boolean = true
 
      return {
-       [Symbol.asyncIterator](): AsyncIterableIterator<Document> {
+       [Symbol.asyncIterator](): AsyncIterableIterator<Doc> {
          return this;
        },
-       async next(): Promise<IteratorResult<Document>> {
+       async next(): Promise<IteratorResult<Doc>> {
          // console.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> NEXT")
          // if (sawEof) {
          //   return { value: new Uint8Array(), done: true };
@@ -290,7 +290,7 @@ export function createClient(conf: ClientConfig): DynamoDBClient {
     conf.region === "local" ? "" : "s"
   }://${host}:${conf.port || 8000}/`;
 
-  const _conf: Document = { ...conf, host, method, endpoint };
+  const _conf: Doc = { ...conf, host, method, endpoint };
 
   const ddbc: DynamoDBClient = {} as DynamoDBClient;
 

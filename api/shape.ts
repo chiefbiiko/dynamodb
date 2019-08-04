@@ -1,8 +1,8 @@
 import { toUint8Array as base64ToUint8Array,
 fromUint8Array as base64FromUint8Array} from "https://deno.land/x/base64/mod.ts"
 import { Collection } from "./collection.ts";
-// import { Document } from "./../types.ts"
-import { Document,date, memoizedProperty as utilMemoizedProperty, property as utilProperty} from "./../util.ts"
+// import { Doc } from "./../types.ts"
+import { Doc,date, memoizedProperty as utilMemoizedProperty, property as utilProperty} from "./../util.ts"
 
 function property(obj: any, name: string, value:any, enumerable?: boolean, isValue?:boolean): void {
   if (value !== null && value !== undefined) {
@@ -16,7 +16,7 @@ function memoizedProperty(obj:any, name: string, get: () => any, enumerable?:boo
   }
 }
 
-export function Shape(shape: Document, options: Document = {}, memberName: string) {
+export function Shape(shape: Doc, options: Doc = {}, memberName: string) {
   property(this, 'shape', shape.shape);
   property(this, 'api', options.api, false);
   property(this, 'type', shape.type);
@@ -94,9 +94,9 @@ Shape.types = {
   'binary': BinaryShape
 };
 
-Shape.resolve = function resolve(shape: Document, options: Document={}): Document {
+Shape.resolve = function resolve(shape: Doc, options: Doc={}): Doc {
   if (shape.shape) {
-    const refShape: Document = options.api.shapes[shape.shape];
+    const refShape: Doc = options.api.shapes[shape.shape];
 
     if (!refShape) {
       throw new Error(`Cannot find shape reference: ${shape.shape}`);
@@ -108,10 +108,10 @@ Shape.resolve = function resolve(shape: Document, options: Document={}): Documen
   }
 };
 
-Shape.create = function create(shape: Document, options: Document={}, memberName: string= undefined):any {
+Shape.create = function create(shape: Doc, options: Doc={}, memberName: string= undefined):any {
   if (shape.isShape) {return shape;}
 
-  const refShape:Document = Shape.resolve(shape, options);
+  const refShape:Doc = Shape.resolve(shape, options);
 
   if (refShape) {
     let filteredKeys: string[] = Object.keys(shape);
@@ -153,7 +153,7 @@ Shape.create = function create(shape: Document, options: Document={}, memberName
   }
 };
 
-function CompositeShape(shape: Document) {
+function CompositeShape(shape: Doc) {
   Shape.apply(this, arguments);
   property(this, 'isComposite', true);
 
@@ -162,9 +162,9 @@ function CompositeShape(shape: Document) {
   }
 }
 
-function StructureShape(shape: Document, options: Document={}) {
+function StructureShape(shape: Doc, options: Doc={}) {
   const self: any = this;
-  let requiredMap: Document = null
+  let requiredMap: Doc = null
   const firstInit: boolean = !this.isShape;
 
   CompositeShape.apply(this, arguments);
@@ -178,7 +178,7 @@ function StructureShape(shape: Document, options: Document={}) {
   }
 
   if (shape.members) {
-    property(this, 'members', new Collection(shape.members, options, function(name: string, member:Document): any {
+    property(this, 'members', new Collection(shape.members, options, function(name: string, member:Doc): any {
       return Shape.create(member, options, name);
     }));
 
@@ -188,7 +188,7 @@ function StructureShape(shape: Document, options: Document={}) {
 
     if (shape.event) {
       memoizedProperty(this, 'eventPayloadMemberName', function(): string {
-        const members: Document = self.members;
+        const members: Doc = self.members;
         const memberNames:string[] = self.memberNames;
 
         // iterate over members to find ones that are event payloads
@@ -200,7 +200,7 @@ function StructureShape(shape: Document, options: Document={}) {
       });
 
       memoizedProperty(this, 'eventHeaderMemberNames', function():string[] {
-        const members: Document = self.members;
+        const members: Doc = self.members;
           const memberNames: string[] = self.memberNames;
         const eventHeaderMemberNames: string[] = [];
 
@@ -226,7 +226,7 @@ function StructureShape(shape: Document, options: Document={}) {
         // for (let i:number = 0; i < shape.required.length; i++) {
         //   requiredMap[shape.required[i]] = true;
         // }
-        requiredMap = shape.required.reduce((acc: Document, req: string): Document => {
+        requiredMap = shape.required.reduce((acc: Doc, req: string): Doc => {
           acc[req] = true
           return acc
         }, {})
@@ -250,7 +250,7 @@ function StructureShape(shape: Document, options: Document={}) {
   }
 }
 
-function ListShape(shape: Document, options: Document={}) {
+function ListShape(shape: Doc, options: Doc={}) {
   const self:any = this
   const firstInit :boolean= !this.isShape;
 
@@ -275,13 +275,13 @@ function ListShape(shape: Document, options: Document={}) {
   }
 }
 
-function MapShape(shape: Document, options:Document={}) {
+function MapShape(shape: Doc, options:Doc={}) {
   const firstInit:boolean = !this.isShape;
 
   CompositeShape.apply(this, arguments);
 
   if (firstInit) {
-    property(this, 'defaultValue', function(): Document { return {}; });
+    property(this, 'defaultValue', function(): Doc { return {}; });
     property(this, 'key', Shape.create({type: 'string'}, options));
     property(this, 'value', Shape.create({type: 'string'}, options));
   }
@@ -299,7 +299,7 @@ function MapShape(shape: Document, options:Document={}) {
   }
 }
 
-function TimestampShape(shape: Document) {
+function TimestampShape(shape: Doc) {
   const self:any  = this;
 
   Shape.apply(this, arguments);

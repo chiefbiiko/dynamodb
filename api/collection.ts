@@ -1,6 +1,6 @@
 // var memoizedProperty = require('../util').memoizedProperty;
-// import { Document} from "./../types.ts"
-import { Document, memoizedProperty, noop} from "./../util.ts"
+// import { Doc} from "./../types.ts"
+import { Doc, memoizedProperty, noop} from "./../util.ts"
 
 function memoize(name: string, value: any, factory: (name: string, value: any)=> any/*, nameTr: (name:string)=> string*/): void {
   memoizedProperty(this, name/*nameTr(name)*/, function(): any {
@@ -8,7 +8,7 @@ function memoize(name: string, value: any, factory: (name: string, value: any)=>
   });
 }
 
-export function Collection(iterable: any, options: Document, factory:(name: string, value: any)=> any/*, nameTr: (name:string)=> string = String*/, callback: (name: string, value: any) => any=noop) {
+export function Collection(iterable: any, options: Doc, factory:(name: string, value: any)=> any/*, nameTr: (name:string)=> string = String*/, callback: (name: string, value: any) => any=noop) {
   // nameTr = nameTr || String;
   // var self = this;
 
@@ -23,7 +23,7 @@ export function Collection(iterable: any, options: Document, factory:(name: stri
 
 // export class Collection {
 // 
-//   constructor(iterable: any, options: Document, factory:(name: string, value: any)=> any/*, nameTr: (name:string)=> string = String*/, callback: (name: string, value: any) => any=noop) {
+//   constructor(iterable: any, options: Doc, factory:(name: string, value: any)=> any/*, nameTr: (name:string)=> string = String*/, callback: (name: string, value: any) => any=noop) {
 //     // nameTr = nameTr || String;
 //     // var self = this;
 // 

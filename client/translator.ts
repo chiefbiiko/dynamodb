@@ -1,9 +1,9 @@
 // var util = require('../core').util;
 // var convert = require('./converter');
-import { Document} from "./../util.ts"
+import { Doc} from "./../util.ts"
 import { Converter } from "./converter.ts";
 
-export function Translator({wrapNumbers, convertEmptyValues, attrValue}:Document = {}) {
+export function Translator({wrapNumbers, convertEmptyValues, attrValue}:Doc = {}) {
   // options = options || {};
   this.attrValue = attrValue;
   this.convertEmptyValues = Boolean(convertEmptyValues);
@@ -40,12 +40,12 @@ Translator.prototype.translate = function(value: any, shape:any):any {
   }
 };
 
-Translator.prototype.translateStructure = function(structure: any, shape:any): Document {
+Translator.prototype.translateStructure = function(structure: any, shape:any): Doc {
   const self: any = this;
 
   if (structure == null){ return undefined;}
 
-  const struct: Document = {};
+  const struct: Doc = {};
   // util.each(structure, function(name, value) {
   Object.entries(structure).forEach(([name, value]: [string, any]): void =>{
     const memberShape: any = shape.members[name];
@@ -82,12 +82,12 @@ Translator.prototype.translateList = function(list: any[], shape: any):any[] {
   // return out;
 };
 
-Translator.prototype.translateMap = function(map: Document, shape:any): Document {
+Translator.prototype.translateMap = function(map: Doc, shape:any): Doc {
   const self:any = this;
 
   if (map == null){ return undefined;}
 
-return   Object.entries(map).reduce((acc: Document, [key, value]: [string, any]): Document => {
+return   Object.entries(map).reduce((acc: Doc, [key, value]: [string, any]): Doc => {
     const result: any = self.translate(value, shape.value);
 
     if (result === undefined) {acc[key] = null;}

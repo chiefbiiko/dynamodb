@@ -11,9 +11,9 @@ Object.defineProperty(apiLoader.services['dynamodb'], '2012-08-10', {
 });
 */
 import {resolve} from "https://deno.land/std/fs/path/mod.ts"
-import { Document} from "./../util.ts"
+import { Doc} from "./../util.ts"
 import  { Api } from "./api.ts"
 
-const spec: Document = JSON.parse(new TextDecoder().decode(Deno.readFileSync(resolve("dynamodb-2012-08-10.min.json"))))
+const spec: Doc = JSON.parse(new TextDecoder().decode(Deno.readFileSync(resolve("dynamodb-2012-08-10.min.json"))))
 
 export const API: any = new Api(spec);

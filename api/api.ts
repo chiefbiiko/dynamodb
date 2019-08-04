@@ -1,12 +1,12 @@
 import { Collection} from "./collection.ts"
 import { Operation} from "./operation.ts"
 import {Shape} from "./shape.ts"
-import { Document, memoizedProperty, property/*, string as stringUtil*/} from "./../util.ts"
+import { Doc, memoizedProperty, property/*, string as stringUtil*/} from "./../util.ts"
 
 // var Paginator = require('./paginator');
 // var ResourceWaiter = require('./resource_waiter');
 
-export function Api(api: Document = {}, options: Document={}) {
+export function Api(api: Doc = {}, options: Doc={}) {
   const self: any = this;
   // api = api || {};
   // options = options || {};
@@ -41,17 +41,17 @@ export function Api(api: Document = {}, options: Document={}) {
     return name;
   });
 
-  function addEndpointOperation(name: string, operation: Document): void {
+  function addEndpointOperation(name: string, operation: Doc): void {
     if (operation.endpointoperation) {
       property(self, 'endpointOperation', /*stringUtil.lowerFirst(name)*/ name);
     }
   }
 
-  property(this, 'operations', new Collection(api.operations, options, function(name: string, operation: Document): any {
+  property(this, 'operations', new Collection(api.operations, options, function(name: string, operation: Doc): any {
     return new Operation(name, operation, options);
   }/*, stringUtil.lowerFirst*/, addEndpointOperation));
 
-  property(this, 'shapes', new Collection(api.shapes, options, function(name: string, shape:Document): any {
+  property(this, 'shapes', new Collection(api.shapes, options, function(name: string, shape:Doc): any {
     return Shape.create(shape, options);
   }));
 

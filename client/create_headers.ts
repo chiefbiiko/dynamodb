@@ -1,7 +1,7 @@
 import { sha256 } from "https://denopkg.com/chiefbiiko/sha256/mod.ts";
 import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
 import { awsSignatureV4, kdf } from "./aws_signature_v4.ts";
-import { Document, date } from "./../util.ts";
+import { Doc, date } from "./../util.ts";
 import { ClientConfig } from "./../mod.ts";
 
 /** Service name. */
@@ -14,7 +14,7 @@ const ALGORITHM: string = "AWS4-HMAC-SHA256";
 const POST_CONTENT_TYPE: string = "application/x-amz-json-1.0";
 
 /** Cache for credentialScope and expensive signature key. */
-function createCache(conf: Document): Document {
+function createCache(conf: Doc): Doc {
   return {
     _day: "",
       _credentialScope: "",
@@ -63,7 +63,7 @@ export interface HeadersConfig extends ClientConfig {
 
 /** Assembles a header object for a DynamoDB request. */
 export function createHeaders(conf: HeadersConfig): Headers {
-  const cache: Document = createCache(conf)
+  const cache: Doc = createCache(conf)
   const amzTarget: string = `DynamoDB_20120810.${conf.op}`;
   // const d: Date = conf.date || new Date();
   const amzDate: string = date.format(conf.date || new Date(), "amz");

@@ -4,13 +4,13 @@ import { assert, assertEquals } from "https://deno.land/std/testing/asserts.ts";
 
 import { encode} from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
 
-import { Document } from "./util.ts";
+import { Doc } from "./util.ts";
 
 import { awsSignatureV4, kdf } from "./client/aws_signature_v4.ts";
 
 import { ClientConfig, DynamoDBClient, createClient } from "./mod.ts";
 
-const ENV: Document = Deno.env();
+const ENV: Doc = Deno.env();
 
 const CONF: ClientConfig = {
   accessKeyId: ENV.ACCESS_KEY_ID,
@@ -38,7 +38,7 @@ test({
   async fn(): Promise<void> {
     const ddbc: DynamoDBClient = createClient(CONF);
 
-    let result: Document = await ddbc.listTables();
+    let result: Doc = await ddbc.listTables();
 
     if (!result.TableNames.includes("users_b")) {
       await ddbc.createTable({
@@ -80,7 +80,7 @@ test({
   async fn(): Promise<void> {
     const ddbc: DynamoDBClient = createClient(CONF);
 
-    let result: Document = await ddbc.listTables();
+    let result: Doc = await ddbc.listTables();
 
     if (!result.TableNames.includes("users_a")) {
       await ddbc.createTable(
@@ -144,7 +144,7 @@ test({
   async fn(): Promise<void> {
     const ddbc: DynamoDBClient = createClient(CONF);
 
-    let result: Document = await ddbc.listTables();
+    let result: Doc = await ddbc.listTables();
 
     if (!result.TableNames.includes("users_c")) {
       await ddbc.createTable({
@@ -157,7 +157,7 @@ test({
 
     const N: number = 25;
 
-    const params: Document = {
+    const params: Doc = {
       RequestItems: { users_c: new Array(N) }
     };
 
@@ -199,7 +199,7 @@ test({
   async fn(): Promise<void> {
     const ddbc: DynamoDBClient = createClient(CONF);
 
-    let result: Document = await ddbc.listTables();
+    let result: Doc = await ddbc.listTables();
 
     if (!result.TableNames.includes("users_d")) {
       await ddbc.createTable({
@@ -250,7 +250,7 @@ test({
   async fn(): Promise<void> {
     const ddbc: DynamoDBClient = createClient(CONF);
 
-    let result: Document = await ddbc.listTables();
+    let result: Doc = await ddbc.listTables();
 
     if (!result.TableNames.includes("users_e")) {
       await ddbc.createTable({
@@ -264,10 +264,10 @@ test({
       const n: number = 25;
    const N:number = 20 * n
 
-    function batch(_: null, i: number): Promise<Document> {
+    function batch(_: null, i: number): Promise<Doc> {
       const trash: Uint8Array = new Uint8Array(4096)
 
-      const params: Document = {
+      const params: Doc = {
         RequestItems: { users_e: new Array(n) }
       };
 
@@ -286,12 +286,12 @@ test({
     }
 
     // 20 * n items each gt 4096 bytes
-    const batches: Promise<Document>[] = new Array(20).fill(null).map(batch);
+    const batches: Promise<Doc>[] = new Array(20).fill(null).map(batch);
 
-    const results: Document[] = await Promise.all(batches);
+    const results: Doc[] = await Promise.all(batches);
 
     const unprocessed: number = results.reduce(
-      (acc: number, result: Document): number =>
+      (acc: number, result: Doc): number =>
         acc + Object.keys(result.UnprocessedItems).length,
       0
     );
@@ -332,7 +332,7 @@ test({
   async fn(): Promise<void> {
     const ddbc: DynamoDBClient = createClient(CONF);
 
-    let result: Document = await ddbc.listTables();
+    let result: Doc = await ddbc.listTables();
 
     if (!result.TableNames.includes("users_f")) {
       await ddbc.createTable({
@@ -345,10 +345,10 @@ test({
 
       const n: number = 25;
 
-    function batch(_: null, i: number): Promise<Document> {
+    function batch(_: null, i: number): Promise<Doc> {
       const trash: Uint8Array = new Uint8Array(4096)
 
-      const params: Document = {
+      const params: Doc = {
         RequestItems: { users_f: new Array(n) }
       };
 
@@ -367,12 +367,12 @@ test({
     }
 
     // 20 * n items each gt 4096 bytes
-    const batches: Promise<Document>[] = new Array(20).fill(null).map(batch);
+    const batches: Promise<Doc>[] = new Array(20).fill(null).map(batch);
 
-    const results: Document[] = await Promise.all(batches);
+    const results: Doc[] = await Promise.all(batches);
 
     const unprocessed: number = results.reduce(
-      (acc: number, result: Document): number =>
+      (acc: number, result: Doc): number =>
         acc + Object.keys(result.UnprocessedItems).length,
       0
     );

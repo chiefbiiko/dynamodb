@@ -4,10 +4,10 @@ import { Shape } from "./shape.ts"
 // var util = require('../util');
 // var property = util.property;
 // var memoizedProperty = util.memoizedProperty;
-import { Document, memoizedProperty, property} from "./../util.ts"
-// import { Document} from "./../types.ts"
+import { Doc, memoizedProperty, property} from "./../util.ts"
+// import { Doc} from "./../types.ts"
 
-export function Operation(name: string, operation: Document, options: Document={}) {
+export function Operation(name: string, operation: Doc, options: Doc={}) {
   const self:any = this;
   // options = options || {};
 
@@ -70,15 +70,15 @@ export function Operation(name: string, operation: Document, options: Document={
   // idempotentMembers only tracks top-level input shapes
   memoizedProperty(this, 'idempotentMembers', function(): string[] {
     // const idempotentMembers: string[] = [];
-    // const input: Document = self.input;
-    // const members: Document = input.members;
+    // const input: Doc = self.input;
+    // const members: Doc = input.members;
 
     if (!self.input.members) {
       return []//idempotentMembers;
     }
 
-return Object.entries(self.input.members).filter(([_, value]: [string, Document]): boolean => value.isIdempotent)
-  .map(([key, _]: [string, Document]): string => key)
+return Object.entries(self.input.members).filter(([_, value]: [string, Doc]): boolean => value.isIdempotent)
+  .map(([key, _]: [string, Doc]): string => key)
 
     // for (const name in members) {
     //   if (!members.hasOwnProperty(name)) {
@@ -99,8 +99,8 @@ return Object.entries(self.input.members).filter(([_, value]: [string, Document]
   });
 }
 
-function hasEventStream(topLevelShape: Document): boolean {
-  const members: Document = topLevelShape.members;
+function hasEventStream(topLevelShape: Doc): boolean {
+  const members: Doc = topLevelShape.members;
   const payload:string = topLevelShape.payload;
 
   if (!topLevelShape.members) {
@@ -108,7 +108,7 @@ function hasEventStream(topLevelShape: Document): boolean {
   }
 
   if (payload) {
-    const payloadMember: Document = members[payload];
+    const payloadMember: Doc = members[payload];
     return payloadMember.isEventStream;
   }
 

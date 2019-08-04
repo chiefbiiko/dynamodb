@@ -1,6 +1,6 @@
 import { OPS, NO_PARAMS_OPS } from "./mod.ts";
 
-import { Document } from "./util.ts";
+import { Doc } from "./util.ts";
 
 const README0: string = `
 # dynamodb
@@ -38,18 +38,18 @@ const result = await ddbc.listTables();
 
 \`\`\` ts
 /** Generic document. */
-export interface Document {
+export interface Doc {
   [key: string]: any;
 }
 
 /** Generic representation of a DynamoDB client. */
 export interface DynamoDBClient {
-  describeEndpoints: (options?: Document) => Promise<Document>;
-  describeLimits: (options?: Document) => Promise<Document>;
-  listTables: (options?: Document) => Promise<Document>;
-  scan: (params?: Document, options?: Document) => Promise<Document | AsyncIterableIterator<Document>>;
-  query: (params?: Document, options?: Document) => Promise<Document | AsyncIterableIterator<Document>>;
-  [key: string]: (params?: Document, options?: Document) => Promise<Document>;
+  describeEndpoints: (options?: Doc) => Promise<Doc>;
+  describeLimits: (options?: Doc) => Promise<Doc>;
+  listTables: (options?: Doc) => Promise<Doc>;
+  scan: (params?: Doc, options?: Doc) => Promise<Doc | AsyncIterableIterator<Doc>>;
+  query: (params?: Doc, options?: Doc) => Promise<Doc | AsyncIterableIterator<Doc>>;
+  [key: string]: (params?: Doc, options?: Doc) => Promise<Doc>;
 }
 
 /** Client configuration. */
@@ -96,15 +96,15 @@ Don't want to do all development against the real AWS cloud?
 
 `;
 
-const { contents, ops }: Document = Array.from(OPS)
+const { contents, ops }: Doc = Array.from(OPS)
   .map(
-    (op: string, i: number): Document => {
-      const params: string = NO_PARAMS_OPS.has(op) ? "" : "params: Document, ";
+    (op: string, i: number): Doc => {
+      const params: string = NO_PARAMS_OPS.has(op) ? "" : "params: Doc, ";
 
       const rtn: string = `Promise<${
         op === "Scan" || op === "Query"
-          ? "Document | AsyncIterableIterator<Document>"
-          : "Document"
+          ? "Doc | AsyncIterableIterator<Doc>"
+          : "Doc"
       }>`;
 
       const camel: string = `${op[0].toLowerCase()}${op.slice(1)}`;
@@ -114,7 +114,7 @@ const { contents, ops }: Document = Array.from(OPS)
       const tail: string = i === OPS.size - 1 ? "" : "\n\n";
 
       return {
-        contentItem: `  + [${op}](#${op})${tail}`,
+        contentItem: `    + [${op}](#${op})${tail}`,
         opItem:
           `#### ${op}\n\n##### \`${signature}\`\n\n` +
           `[aws ${op} docs](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_${op}.html)${tail}`
@@ -124,9 +124,9 @@ const { contents, ops }: Document = Array.from(OPS)
   .reduce(
     (
       acc: { contents: string[]; ops: string[] },
-      { contentItem, opItem }: Document,
+      { contentItem, opItem }: Doc,
       i: number
-    ): Document => {
+    ): Doc => {
       acc.contents[3 + i] = contentItem;
       acc.ops[i] = opItem;
 

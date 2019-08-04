@@ -2,7 +2,7 @@ const ANY_BUT_DIGITS: RegExp = /[^\d]/g;
 const ANY_BUT_DIGITS_T: RegExp = /[^\dT]/g;
 
 /** Generic document. */
-export interface Document {
+export interface Doc {
   [key: string]: any;
 }
 
@@ -11,7 +11,7 @@ export function noop(..._: any[]): void {}
 
 /** Defines a property. */
 export function property(obj:any, name:string, value:any, enumerable?:boolean, isValue?:boolean):void {
-  const opts: Document = {
+  const opts: Doc = {
     configurable: true,
     enumerable: typeof enumerable === "boolean" ? enumerable : true
   };
@@ -98,7 +98,7 @@ function isBinary(data: any): boolean {
 }
 
 /** Mapping member to set type. */
-const memberTypeToSetType: Document = {
+const memberTypeToSetType: Doc = {
   String: 'String',
   Number: 'Number',
   NumberValue: 'Number',
@@ -112,7 +112,7 @@ export class DynamoDBSet {
   readonly type: string;
 
   /** Creates a dynamodb set. */
-  constructor(list: any[]=[], options: Document={}) {
+  constructor(list: any[]=[], options: Doc={}) {
     this.values = [].concat(list);
 
     this.type = memberTypeToSetType[typeOf(this.values[0])];
@@ -140,7 +140,7 @@ export class DynamoDBSet {
  * An object recognizable as a numeric value that stores the underlying number
  * as a string.
  *
- * Intended to be a deserialization target for the DynamoDB Document Client when
+ * Intended to be a deserialization target for the DynamoDB Doc Client when
  * the `wrapNumbers` flag is set. This allows for numeric values that lose
  * precision when converted to JavaScript's `number` type.
  */
@@ -170,7 +170,7 @@ export class DynamoDBNumberValue {
 }
 
 /** Date format helpers. */
-export const date: Document = {
+export const date: Doc = {
   /** Date stamp format as expected by awsSignatureV4KDF. */
  DATE_STAMP_REGEX: /^\d{8}$/,
   amz(date: Date): string {
