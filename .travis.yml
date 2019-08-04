@@ -4,6 +4,9 @@ os:
   - linux
   - osx
 
-before_script: curl -sL https://deno.land/x/install/install.sh | sh
+before_script: |
+  curl -sL https://deno.land/x/install/install.sh | sh && \
+  chmod +x ./start_db.sh && \
+  ./start_db.sh
 
-script: $HOME/.deno/bin/deno run --allow-read=$(pwd) --allow-env ./test.ts
+script: $HOME/.deno/bin/deno run --allow-read=$(pwd) --allow-env --allow-net ./test.ts

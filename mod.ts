@@ -1,8 +1,7 @@
 import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
-import { HeadersConfig, createHeaders } from "./client/create_headers.ts";
-import { Translator } from "./client/translator.ts";
-import { Doc } from "./util.ts";
+import { HeadersConfig, createHeaders,Translator } from "./client/mod.ts";
 import { API } from "./api/mod.ts"
+import { Doc } from "./util.ts";
 
 /** Base shape of all DynamoDB query schemas. */
 const ATTR_VALUE: string = API.operations.PutItem.input.members.Item.value.shape;

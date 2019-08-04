@@ -1,6 +1,5 @@
 // var Shape = require('./shape');
 import { Shape } from "./shape.ts"
-
 // var util = require('../util');
 // var property = util.property;
 // var memoizedProperty = util.memoizedProperty;

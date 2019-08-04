@@ -2,6 +2,9 @@ build: off
 
 install:
   - ps: iex (iwr https://deno.land/x/install/install.ps1)
+  
+before_script:
+  - cmd: start_db.sh
 
 test_script: 
-  - cmd: deno run --allow-read --allow-env ./test.ts
+  - cmd: deno run --allow-read --allow-env --allow-net ./test.ts

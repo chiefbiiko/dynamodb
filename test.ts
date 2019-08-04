@@ -1,14 +1,9 @@
 import { test, runIfMain } from "https://deno.land/std/testing/mod.ts";
-
 import { assert, assertEquals } from "https://deno.land/std/testing/asserts.ts";
-
 import { encode} from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
-
-import { Doc } from "./util.ts";
-
-import { awsSignatureV4, kdf } from "./client/aws_signature_v4.ts";
-
+import { awsSignatureV4, kdf } from "./client/mod.ts";
 import { ClientConfig, DynamoDBClient, createClient } from "./mod.ts";
+import { Doc } from "./util.ts";
 
 const ENV: Doc = Deno.env();
 

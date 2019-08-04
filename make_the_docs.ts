@@ -1,5 +1,4 @@
 import { OPS, NO_PARAMS_OPS } from "./mod.ts";
-
 import { Doc } from "./util.ts";
 
 const README0: string = `
