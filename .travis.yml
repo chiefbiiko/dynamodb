@@ -10,5 +10,4 @@ before_script:
   - curl -sSL https://denopkg.com/chiefbiiko/dynamodb/start_db.sh | bash
 
 script:
-  - ACCESS_KEY_ID=fraud SECRET_ACCESS_KEY=fraud \
-    $HOME/.deno/bin/deno run --allow-read=$(pwd) --allow-env --allow-net ./test.ts
+  - ACCESS_KEY_ID=fraud SECRET_ACCESS_KEY=fraud $HOME/.deno/bin/deno run --allow-read=$(pwd) --allow-env --allow-net ./test.ts
