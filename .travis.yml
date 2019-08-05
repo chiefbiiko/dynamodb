@@ -6,6 +6,7 @@ os:
 
 before_script:
   - curl -sSL https://deno.land/x/install/install.sh | sh
+  - cd $TRAVIS_BUILD_DIR
   - curl -sSL https://denopkg.com/chiefbiiko/dynamodb/start_db.sh | bash
 
 script:

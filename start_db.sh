@@ -10,4 +10,4 @@ if [[ ! -d $DIR ]]; then
   curl --progress-bar $URL | tar --directory=$DIR -zxf - 
 fi
 
-java -D"java.library.path=$DIR/DynamoDBLocal_lib" -jar "$DIR/DynamoDBLocal.jar" -sharedDb
+java -D"java.library.path=$DIR/DynamoDBLocal_lib" -jar "$DIR/DynamoDBLocal.jar" -sharedDb &
