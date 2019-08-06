@@ -5,6 +5,8 @@
 
 DynamoDB client.
 
+> 👾⚡️🌀🌁🌊🐱🐶 Can't run this against a real DynamoDB until Deno supports TLS. Till then [DynamoDB Local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html).
+
 ## Usage
 
 ``` ts
