@@ -81,6 +81,8 @@ Creates a DynamoDB client.
 
 ### Ops
 
+The client supports all DynamoDB operations. Check the linked aws docs for info about parameters of a specific operation.
+
 <OPS/>
 
 ## FYI

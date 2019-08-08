@@ -17,15 +17,15 @@ const POST_CONTENT_TYPE: string = "application/x-amz-json-1.0";
 function createCache(conf: Doc): Doc {
   return {
     _day: "",
-      _credentialScope: "",
+    _credentialScope: "",
     _key: null,
-    _maybeRefresh():void {
-      const d: Date = new Date()
-      const day: string = d.toISOString().slice(8,10)
+    _maybeRefresh(): void {
+      const d: Date = new Date();
+      const day: string = d.toISOString().slice(8, 10);
 
       if (this._day !== day) {
         // the key and credentialScope values are obsolete
-        const dateStamp: string = date.format(d, "dateStamp")
+        const dateStamp: string = date.format(d, "dateStamp");
 
         this._key = kdf(
           conf.secretAccessKey,
@@ -34,22 +34,24 @@ function createCache(conf: Doc): Doc {
           SERVICE
         ) as Uint8Array;
 
-        this._credentialScope = `${dateStamp}/${ conf.region }/${SERVICE}/aws4_request`;
+        this._credentialScope = `${dateStamp}/${
+          conf.region
+        }/${SERVICE}/aws4_request`;
 
-        this._day = day
+        this._day = day;
       }
     },
-      get key(): Uint8Array {
-        this._maybeRefresh();
+    get key(): Uint8Array {
+      this._maybeRefresh();
 
-        return this._key
-      },
-      get credentialScope(): string {
-        this._maybeRefresh();
+      return this._key;
+    },
+    get credentialScope(): string {
+      this._maybeRefresh();
 
-        return this._credentialScope
-      }
-  }
+      return this._credentialScope;
+    }
+  };
 }
 
 /** Required configuration for assembling headers. */
@@ -63,7 +65,7 @@ export interface HeadersConfig extends ClientConfig {
 
 /** Assembles a header object for a DynamoDB request. */
 export function createHeaders(conf: HeadersConfig): Headers {
-  const cache: Doc = createCache(conf)
+  const cache: Doc = createCache(conf);
   const amzTarget: string = `DynamoDB_20120810.${conf.op}`;
   // const d: Date = conf.date || new Date();
   const amzDate: string = date.format(conf.date || new Date(), "amz");
@@ -93,7 +95,9 @@ export function createHeaders(conf: HeadersConfig): Headers {
   // }/${SERVICE}/aws4_request`;
 
   const msg: Uint8Array = encode(
-    `${ALGORITHM}\n${amzDate}\n${cache.credentialScope}\n${canonicalRequestDigest}`,
+    `${ALGORITHM}\n${amzDate}\n${
+      cache.credentialScope
+    }\n${canonicalRequestDigest}`,
     "utf8"
   );
 
@@ -104,11 +108,13 @@ export function createHeaders(conf: HeadersConfig): Headers {
   //   SERVICE
   // ) as Uint8Array;
 
-  const signature: string = awsSignatureV4(cache.key,msg, "hex") as string
+  const signature: string = awsSignatureV4(cache.key, msg, "hex") as string;
 
   const authorizationHeader: string = `${ALGORITHM} Credential=${
     conf.accessKeyId
-  }/${cache.credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+  }/${
+    cache.credentialScope
+  }, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
   return new Headers({
     "Content-Type": POST_CONTENT_TYPE,

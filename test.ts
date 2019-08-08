@@ -1,6 +1,6 @@
 import { test, runIfMain } from "https://deno.land/std/testing/mod.ts";
 import { assert, assertEquals } from "https://deno.land/std/testing/asserts.ts";
-import { encode} from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
+import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
 import { awsSignatureV4, kdf } from "./client/mod.ts";
 import { ClientConfig, DynamoDBClient, createClient } from "./mod.ts";
 import { Doc } from "./util.ts";
@@ -16,11 +16,21 @@ const CONF: ClientConfig = {
 test({
   name: "aws signature v4 flow",
   fn(): void {
-    const expectedSignature: string = "31fac5ed29db737fbcafac527470ca6d9283283197c5e6e94ea40ddcec14a9c1";
-    
-    const key: Uint8Array = kdf("secret", "20310430", "region", "dynamodb", "utf8") as Uint8Array;
-    
-    const msg: Uint8Array = encode("AWS4-HMAC-SHA256\n20310430T201613Z\n20310430/region/dynamodb/aws4_request\n4be20e7bf75dc6c7e93873b5f49096771729b8a28f0c62010db431fea79220ef", "utf8");
+    const expectedSignature: string =
+      "31fac5ed29db737fbcafac527470ca6d9283283197c5e6e94ea40ddcec14a9c1";
+
+    const key: Uint8Array = kdf(
+      "secret",
+      "20310430",
+      "region",
+      "dynamodb",
+      "utf8"
+    ) as Uint8Array;
+
+    const msg: Uint8Array = encode(
+      "AWS4-HMAC-SHA256\n20310430T201613Z\n20310430/region/dynamodb/aws4_request\n4be20e7bf75dc6c7e93873b5f49096771729b8a28f0c62010db431fea79220ef",
+      "utf8"
+    );
 
     const actualSignature: string = awsSignatureV4(key, msg, "hex") as string;
 
@@ -37,11 +47,11 @@ test({
 
     if (!result.TableNames.includes("users_b")) {
       await ddbc.createTable({
-       TableName: "users_b",
-       KeySchema: [{ KeyType: "HASH", AttributeName: "id" }],
-       AttributeDefinitions: [{ AttributeName: "id", AttributeType: "S" }],
-       ProvisionedThroughput: { ReadCapacityUnits: 1, WriteCapacityUnits: 1 }
-     });
+        TableName: "users_b",
+        KeySchema: [{ KeyType: "HASH", AttributeName: "id" }],
+        AttributeDefinitions: [{ AttributeName: "id", AttributeType: "S" }],
+        ProvisionedThroughput: { ReadCapacityUnits: 1, WriteCapacityUnits: 1 }
+      });
     }
 
     const friends: string[] = ["djb", "devil", "donkey kong"];
@@ -256,11 +266,11 @@ test({
       });
     }
 
-      const n: number = 25;
-   const N:number = 20 * n
+    const n: number = 25;
+    const N: number = 20 * n;
 
     function batch(_: null, i: number): Promise<Doc> {
-      const trash: Uint8Array = new Uint8Array(4096)
+      const trash: Uint8Array = new Uint8Array(4096);
 
       const params: Doc = {
         RequestItems: { users_e: new Array(n) }
@@ -293,22 +303,22 @@ test({
 
     assertEquals(unprocessed, 0);
 
-     const ait: any= await  ddbc.scan({ TableName: "users_e" })
+    const ait: any = await ddbc.scan({ TableName: "users_e" });
 
-    let pages: number = 0
-    let items: number = 0
+    let pages: number = 0;
+    let items: number = 0;
 
     for await (const page of ait) {
-            assert(Array.isArray(page.Items))
-            assert(page.Items.length > 0)
-            
-      ++pages
-      items += page.Count
+      assert(Array.isArray(page.Items));
+      assert(page.Items.length > 0);
+
+      ++pages;
+      items += page.Count;
     }
 
-    assertEquals(pages, 2)
+    assertEquals(pages, 2);
 
-    assertEquals(items, N)
+    assertEquals(items, N);
 
     result = await ddbc.deleteTable({
       TableName: "users_e"
@@ -338,10 +348,10 @@ test({
       });
     }
 
-      const n: number = 25;
+    const n: number = 25;
 
     function batch(_: null, i: number): Promise<Doc> {
-      const trash: Uint8Array = new Uint8Array(4096)
+      const trash: Uint8Array = new Uint8Array(4096);
 
       const params: Doc = {
         RequestItems: { users_f: new Array(n) }
@@ -374,12 +384,12 @@ test({
 
     assertEquals(unprocessed, 0);
 
-     // only fetching 1 page - not async iterating
-     result= await  ddbc.scan({ TableName: "users_f" }, { iteratePages: false})
+    // only fetching 1 page - not async iterating
+    result = await ddbc.scan({ TableName: "users_f" }, { iteratePages: false });
 
-     assert(Array.isArray(result.Items))
-     assert(result.Items.length > 0)
-     assert(!!result.LastEvaluatedKey)
+    assert(Array.isArray(result.Items));
+    assert(result.Items.length > 0);
+    assert(!!result.LastEvaluatedKey);
 
     result = await ddbc.deleteTable({
       TableName: "users_f"

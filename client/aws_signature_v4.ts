@@ -9,7 +9,11 @@ import { date } from "./../util.ts";
 const AWS4: Uint8Array = encode("AWS4", "utf8");
 
 /** Creates a HMAC-SHA256 mac.*/
-export function awsSignatureV4(key: Uint8Array, msg: Uint8Array, outputEncoding?: string): string | Uint8Array {
+export function awsSignatureV4(
+  key: Uint8Array,
+  msg: Uint8Array,
+  outputEncoding?: string
+): string | Uint8Array {
   return hmac("sha256", key, msg, null, outputEncoding);
 }
 
