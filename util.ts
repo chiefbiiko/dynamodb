@@ -9,6 +9,11 @@ export interface Doc {
 /** noop. */
 export function noop(..._: any[]): void {}
 
+/** camelCase */
+export function camelCase(text: string): string {
+  return `${text[0].toLowerCase()}${text.slice(1)}`;
+}
+
 /** Defines a property. */
 export function property(
   obj: any,
