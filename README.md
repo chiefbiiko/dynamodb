@@ -121,9 +121,15 @@ export interface DynamoDBClient {
   describeEndpoints: (options?: Doc) => Promise<Doc>;
   describeLimits: (options?: Doc) => Promise<Doc>;
   listTables: (options?: Doc) => Promise<Doc>;
-  scan: (params?: Doc, options?: Doc) => Promise<Doc | AsyncIterableIterator<Doc>>;
-  query: (params?: Doc, options?: Doc) => Promise<Doc | AsyncIterableIterator<Doc>>;
-  [key: string]: (params?: Doc, options?: Doc) => Promise<Doc>;
+  scan: (
+    params: Doc,
+    options?: Doc
+  ) => Promise<Doc | AsyncIterableIterator<Doc>>;
+  query: (
+    params: Doc,
+    options?: Doc
+  ) => Promise<Doc | AsyncIterableIterator<Doc>>;
+  [key: string]: (params: Doc, options?: Doc) => Promise<Doc>;
 }
 
 /** Client configuration. */

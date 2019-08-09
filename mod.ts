@@ -12,14 +12,14 @@ export interface DynamoDBClient {
   describeLimits: (options?: Doc) => Promise<Doc>;
   listTables: (options?: Doc) => Promise<Doc>;
   scan: (
-    params?: Doc,
+    params: Doc,
     options?: Doc
   ) => Promise<Doc | AsyncIterableIterator<Doc>>;
   query: (
-    params?: Doc,
+    params: Doc,
     options?: Doc
   ) => Promise<Doc | AsyncIterableIterator<Doc>>;
-  [key: string]: (params?: Doc, options?: Doc) => Promise<Doc>;
+  [key: string]: (params: Doc, options?: Doc) => Promise<Doc>;
 }
 
 /** Client configuration. */
@@ -79,7 +79,7 @@ export const OPS: Set<string> = new Set<string>([
   "UpdateTimeToLive"
 ]);
 
-const NO_PARAMS_OPS: Set<string> = new Set<string>([
+export const NO_PARAMS_OPS: Set<string> = new Set<string>([
   "DescribeEndpoints",
   "DescribeLimits",
   "ListTables"
