@@ -134,26 +134,21 @@ function createCache(conf: Doc): Doc {
 }
 
 /** Base fetch. */
-function baseFetch(conf: Doc, op: string, params: Doc): Promise<Doc> {
+async function baseFetch(conf: Doc, op: string, params: Doc): Promise<Doc> {
   const payload: Uint8Array = encode(JSON.stringify(params), "utf8");
 
   const headers: Headers = createHeaders(op, payload, conf as HeadersConfig);
 
-  return fetch(conf.endpoint, {
+  const response: Response = await fetch(conf.endpoint, {
     method: conf.method,
     headers,
     body: payload
-  }).then(
-    (response: Response): Doc => {
-      if (!response.ok) {
-        throw new Error(
-          `http query request failed: ${response.status} ${response.statusText}`
-        );
-      }
-
-      return response.json();
-    }
-  );
+  });
+  const body = await response.json();
+  if (!response.ok) {
+    throw new Error(body.message);
+  }
+  return body;
 }
 
 /** Base op. */
