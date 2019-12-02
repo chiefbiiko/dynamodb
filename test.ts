@@ -432,4 +432,20 @@ test({
   }
 });
 
+test({
+  name: "test security token can be passed",
+  async fn(): Promise<void> {
+    // currently there's no way to test this is appended to the header
+    // but we include it in the ClientConfig.
+    const conf: ClientConfig = {
+      accessKeyId: ENV.ACCESS_KEY_ID,
+      secretAccessKey: ENV.SECRET_ACCESS_KEY,
+      region: "local",
+      sessionToken: () => "test"
+    };
+    const ddbc: DynamoDBClient = createClient(conf);
+    const result: Doc = await ddbc.listTables();
+  }
+});
+
 runIfMain(import.meta);
