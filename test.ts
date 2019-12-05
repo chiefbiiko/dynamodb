@@ -1,5 +1,9 @@
 import { test, runIfMain } from "https://deno.land/std/testing/mod.ts";
-import { assert, assertEquals } from "https://deno.land/std/testing/asserts.ts";
+import {
+  assert,
+  assertEquals,
+  assertThrowsAsync
+} from "https://deno.land/std/testing/asserts.ts";
 import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
 import { awsSignatureV4, kdf } from "./client/mod.ts";
 import { ClientConfig, DynamoDBClient, createClient } from "./mod.ts";
@@ -400,6 +404,31 @@ test({
     result = await ddbc.listTables();
 
     assert(!result.TableNames.includes("users_f"));
+  }
+});
+
+test({
+  name: "missing table throws a readable error",
+  async fn(): Promise<void> {
+    const ddbc: DynamoDBClient = createClient(CONF);
+
+    let result: Doc = await ddbc.listTables();
+
+    if (result.TableNames.includes("nonexistent_table")) {
+      await ddbc.deleteTable({
+        TableName: "nonexistent_table"
+      });
+    }
+
+    async function fn(): Promise<void> {
+      await ddbc.scan({ TableName: "nonexistent_table" });
+    }
+
+    assertThrowsAsync(
+      fn,
+      Error,
+      "Cannot do operations on a non-existent table"
+    );
   }
 });
 
