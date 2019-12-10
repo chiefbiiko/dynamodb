@@ -3,8 +3,8 @@ import { Shape } from "./shape.ts";
 // var util = require('../util');
 // var property = util.property;
 // var memoizedProperty = util.memoizedProperty;
-import { Doc, memoizedProperty, property } from "./../util.ts";
-// import { Doc} from "./../types.ts"
+import { Doc, memoizedProperty, property } from "../util.ts";
+// import { Doc} from "../types.ts"
 
 export function Operation(name: string, operation: Doc, options: Doc = {}) {
   const self: any = this;

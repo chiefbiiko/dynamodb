@@ -1,6 +1,6 @@
 // var memoizedProperty = require('../util').memoizedProperty;
-// import { Doc} from "./../types.ts"
-import { Doc, memoizedProperty, noop } from "./../util.ts";
+// import { Doc} from "../types.ts"
+import { Doc, memoizedProperty, noop } from "../util.ts";
 
 function memoize(
   name: string,

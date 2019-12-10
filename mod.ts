@@ -1,6 +1,6 @@
-import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
-import { HeadersConfig, Translator, createHeaders, kdf } from "./client/mod.ts";
+import { encode } from "./deps.ts";
 import { API } from "./api/mod.ts";
+import { HeadersConfig, Translator, createHeaders, kdf } from "./client/mod.ts";
 import { Doc, camelCase, date } from "./util.ts";
 
 /** Convenience export. */

@@ -1,10 +1,10 @@
-import { test, runIfMain } from "https://deno.land/std/testing/mod.ts";
+import { test, runIfMain } from "https://deno.land/std@v0.26.0/testing/mod.ts";
 import {
   assert,
   assertEquals,
   assertThrowsAsync
-} from "https://deno.land/std/testing/asserts.ts";
-import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
+} from "https://deno.land/std@v0.26.0/testing/asserts.ts";
+import { encode } from "./deps.ts";
 import { awsSignatureV4, kdf } from "./client/mod.ts";
 import { ClientConfig, DynamoDBClient, createClient } from "./mod.ts";
 import { Doc } from "./util.ts";

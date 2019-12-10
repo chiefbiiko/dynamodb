@@ -1,9 +1,5 @@
-import {
-  encode,
-  decode
-} from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
-import { hmac } from "https://denopkg.com/chiefbiiko/hmac/mod.ts";
-import { date } from "./../util.ts";
+import { encode, decode, hmac } from "../deps.ts";
+import { date } from "../util.ts";
 
 /** Some magic bytes. */
 const AWS4: Uint8Array = encode("AWS4", "utf8");

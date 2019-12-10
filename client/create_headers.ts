@@ -1,8 +1,7 @@
-import { sha256 } from "https://denopkg.com/chiefbiiko/sha256/mod.ts";
-import { encode } from "https://denopkg.com/chiefbiiko/std-encoding/mod.ts";
+import { sha256, encode } from "../deps.ts";
 import { awsSignatureV4 } from "./aws_signature_v4.ts";
-import { Doc, date } from "./../util.ts";
-import { ClientConfig } from "./../mod.ts";
+import { Doc, date } from "../util.ts";
+import { ClientConfig } from "../mod.ts";
 
 /** Algorithm identifer. */
 const ALGORITHM: string = "AWS4-HMAC-SHA256";
