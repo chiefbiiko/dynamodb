@@ -5,7 +5,7 @@ import {
   Doc,
   memoizedProperty,
   property /*, string as stringUtil*/
-} from "./../util.ts";
+} from "../util.ts";
 
 // var Paginator = require('./paginator');
 // var ResourceWaiter = require('./resource_waiter');

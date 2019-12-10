@@ -1,4 +1,4 @@
-import { Doc } from "./../util.ts";
+import { Doc } from "../util.ts";
 import { Api } from "./api.ts";
 
 const spec: Doc = JSON.parse(`

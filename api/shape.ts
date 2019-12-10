@@ -1,15 +1,12 @@
-import {
-  toUint8Array as base64ToUint8Array,
-  fromUint8Array as base64FromUint8Array
-} from "https://deno.land/x/base64/mod.ts";
+import { base64ToUint8Array, base64FromUint8Array } from "../deps.ts";
 import { Collection } from "./collection.ts";
-// import { Doc } from "./../types.ts"
+// import { Doc } from "../types.ts"
 import {
   Doc,
   date,
   memoizedProperty as utilMemoizedProperty,
   property as utilProperty
-} from "./../util.ts";
+} from "../util.ts";
 
 function property(
   obj: any,
