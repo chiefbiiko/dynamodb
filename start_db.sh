@@ -6,7 +6,7 @@ URL="https://s3.eu-central-1.amazonaws.com/dynamodb-local-frankfurt/dynamodb_loc
 DIR="./dynamodb_local_latest"
 
 if [[ ! -d $DIR ]]; then
-  mkdir $DIR
+  mkdir "$DIR"
   curl --progress-bar $URL | tar --directory=$DIR -zxf - 
 fi
 
