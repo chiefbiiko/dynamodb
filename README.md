@@ -3,8 +3,6 @@
 
 ![ci](https://github.com/chiefbiiko/dynamodb/workflows/ci/badge.svg)
 
-[![Travis](http://img.shields.io/travis/chiefbiiko/dynamodb.svg?style=flat)](http://travis-ci.org/chiefbiiko/dynamodb) [![AppVeyor](https://ci.appveyor.com/api/projects/status/github/chiefbiiko/dynamodb?branch=master&svg=true)](https://ci.appveyor.com/project/chiefbiiko/dynamodb)
-
 DynamoDB client.
 
 ## Usage
