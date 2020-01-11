@@ -10,7 +10,7 @@ DynamoDB client.
 ``` ts
 import { createClient } from "https://denopkg.com/chiefbiiko/dynamodb/mod.ts";
 
-// minimal config to create a client
+// minimal config to create a client - u can use temp creds with a session token
 const conf = {
   accessKeyId: "abc",
   secretAccessKey: "def",
@@ -18,10 +18,10 @@ const conf = {
 }
 
 // the client has all of DynamoDB's operations as camelCased async methods
-const ddbc = createClient(conf);
+const dyno = createClient(conf);
 
 // imagine a world with top-level await
-const result = await ddbc.listTables();
+const result = await dyno.listTables();
 ```
 
 ## API
@@ -136,7 +136,8 @@ export interface ClientConfig {
   secretAccessKey: string; // wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
   region: string; // us-west-2
   canonicalUri?: string; // fx /path/to/somewhere
-  port?: number; // 8000
+  port?: number; // 80
+  sessionToken?: () => string | Promise<string>; // fx aws sts get-session-token
 }
 
 /** Op options. */

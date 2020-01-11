@@ -21,8 +21,13 @@ export interface HeadersConfig extends ClientConfig {
 export async function createHeaders(
   op: string,
   payload: Uint8Array,
-  conf: HeadersConfig
+  conf: HeadersConfig,
+  refreshCredentials: boolean = false
 ): Promise<Headers> {
+  if (refreshCredentials) {
+  await  conf.cache.refresh()
+  }
+  
   const amzTarget: string = `DynamoDB_20120810.${op}`;
 
   const amzDate: string = date.format(conf.date || new Date(), "amz");
@@ -61,7 +66,7 @@ export async function createHeaders(
   ) as string;
 
   const authorizationHeader: string = `${ALGORITHM} Credential=${
-    conf.accessKeyId
+    conf.cache.accessKeyId
   }/${
     conf.cache.credentialScope
   }, SignedHeaders=${signedHeaders}, Signature=${signature}`;
@@ -74,8 +79,8 @@ export async function createHeaders(
   });
 
   // https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html
-  if (conf.sessionToken) {
-    headers.append("X-Amz-Security-Token", await conf.sessionToken());
+  if (conf.cache.sessionToken) {
+    headers.append("X-Amz-Security-Token", conf.cache.sessionToken);
   }
 
   return headers

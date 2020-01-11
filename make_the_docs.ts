@@ -15,17 +15,20 @@ import { createClient } from "https://denopkg.com/chiefbiiko/dynamodb/mod.ts";
 
 // minimal config to create a client
 const conf = {
-  accessKeyId: "abc",
-  secretAccessKey: "def",
-  region: "local"
+  accessKeyId: "abc",       // required
+  secretAccessKey: "def",   // required
+  sessionToken: () => "ghi" // optional
+  region: "local"           // required
 }
 
 // the client has all of DynamoDB's operations as camelCased async methods
-const ddbc = createClient(conf);
+const dyno = createClient(conf);
 
 // imagine a world with top-level await
-const result = await ddbc.listTables();
+const result = await dyno.listTables();
 \`\`\`
+
+Prefer using temporary credentials and a session token.
 
 ## API
 
@@ -63,7 +66,8 @@ export interface ClientConfig {
   secretAccessKey: string; // wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
   region: string; // us-west-2
   canonicalUri?: string; // fx /path/to/somewhere
-  port?: number; // 8000
+  port?: number; // 80
+  sessionToken?: () => string | Promise<string>; // fx aws sts get-session-token
 }
 
 /** Op options. */

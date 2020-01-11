@@ -22,14 +22,20 @@ export interface DynamoDBClient {
   [key: string]: (params: Doc, options?: Doc) => Promise<Doc>;
 }
 
+/** Credentials. */
+export interface Credentials {
+    accessKeyId: string; // AKIAIOSFODNN7EXAMPLE
+    secretAccessKey: string; // wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    sessionToken?: string; // somesessiontoken
+    region?: string; // us-west-2
+}
+
 /** Client configuration. */
 export interface ClientConfig {
-  accessKeyId: string; // AKIAIOSFODNN7EXAMPLE
-  secretAccessKey: string; // wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  credentials: Credentials | (() => Credentials | Promise<Credentials>);
   region: string; // us-west-2
   canonicalUri?: string; // fx /path/to/somewhere
-  port?: number; // 8000
-  sessionToken?: () => string | Promise<string>;
+  port?: number; // 80
 }
 
 /** Op options. */
@@ -94,42 +100,73 @@ const ATTR_VALUE: string =
   API.operations.PutItem.input.members.Item.value.shape;
 
 /** Cache for credentialScope and expensive signature key. */
-function createCache(conf: Doc): Doc {
+function createCache(conf: ClientConfig): Doc {
   return {
-    _day: "",
     _credentialScope: "",
     _key: null,
-    _maybeRefresh(): void {
-      const d: Date = new Date();
-      const day: string = d.toISOString().slice(8, 10);
-
-      if (this._day !== day) {
-        // the key and credentialScope values are obsolete
-        const dateStamp: string = date.format(d, "dateStamp");
-
+    _accessKeyId: "",
+    _sessionToken: "",
+    async refresh(): Promise<void> {
+        const dateStamp: string = date.format(new Date(), "dateStamp");
+        
+        let credentials: Credentials
+        
+        if (typeof conf.credentials === "function") {
+           credentials= await conf.credentials();
+        } else {
+          credentials = conf.credentials
+        }
+        
         this._key = kdf(
-          conf.secretAccessKey,
+          credentials.secretAccessKey,
           dateStamp,
-          conf.region,
+          credentials.region,
           SERVICE
         ) as Uint8Array;
 
-        this._credentialScope = `${dateStamp}/${
-          conf.region
-        }/${SERVICE}/aws4_request`;
-
-        this._day = day;
-      }
+        this._credentialScope = `${dateStamp}/${credentials.region}/${SERVICE}/aws4_request`;
+        this._accessKeyId = credentials.accessKeyId
+        this._sessionToken = credentials.sessionToken
     },
+    // async _maybeRefresh(forceRefresh: boolean = false): Promise<void> {
+      // const d: Date = new Date();
+      // const day: string = d.toISOString().slice(8, 10);
+      // 
+      // if (forceRefresh || this._day !== day) {
+      //   // the key and credentialScope values are obsolete or refresh forced
+      //   const dateStamp: string = date.format(d, "dateStamp");
+      // 
+      //   let credentials: Credentials
+      // 
+      //   if (typeof conf.credentials === "function") {
+      //      credentials= await conf.credentials();
+      //   } else {
+      //     credentials = conf.credentials
+      //   }
+      // 
+      //   this._key = kdf(
+      //     credentials.secretAccessKey,
+      //     dateStamp,
+      //     credentials.region,
+      //     SERVICE
+      //   ) as Uint8Array;
+      // 
+      //   this._credentialScope = `${dateStamp}/${credentials.region}/${SERVICE}/aws4_request`;
+      // 
+      //   this._day = day;
+      // }
+    // },
     get key(): Uint8Array {
-      this._maybeRefresh();
-
-      return this._key;
+       return this._key;
     },
     get credentialScope(): string {
-      this._maybeRefresh();
-
       return this._credentialScope;
+    },
+    get accessKeyId(): string {
+      return this._accessKeyId
+    },
+    get sessionToken(): string {
+      return this._sessionToken
     }
   };
 }
@@ -138,17 +175,37 @@ function createCache(conf: Doc): Doc {
 async function baseFetch(conf: Doc, op: string, params: Doc): Promise<Doc> {
   const payload: Uint8Array = encode(JSON.stringify(params), "utf8");
 
-  const headers: Headers = await createHeaders(op, payload, conf as HeadersConfig);
+  let headers: Headers = await createHeaders(op, payload, conf as HeadersConfig);
 
-  const response: Response = await fetch(conf.endpoint, {
+  let response: Response = await fetch(conf.endpoint, {
     method: conf.method,
     headers,
     body: payload
   });
-  const body = await response.json();
+  
+  let body: Doc = await response.json();
+  
   if (!response.ok) {
+    if (response.status === 403) {
+      // retry once with refreshed credenttials
+      headers = await createHeaders(op, payload, conf as HeadersConfig, true);
+
+      response = await fetch(conf.endpoint, {
+        method: conf.method,
+        headers,
+        body: payload
+      });
+      
+      if (response.ok) {
+        body = await response.json();
+        
+        return body
+      }
+    }
+    
     throw new Error(body.message);
   }
+  
   return body;
 }
 
@@ -241,10 +298,8 @@ async function baseOp(
 
 /** Creates a DynamoDB client. */
 export function createClient(conf: ClientConfig): DynamoDBClient {
-  if (!conf.accessKeyId || !conf.secretAccessKey || !conf.region) {
-    throw new TypeError(
-      "client config must include accessKeyId, secretAccessKey and region"
-    );
+  if (!conf.credentials) {
+    throw new TypeError("client config must include credentials");
   }
 
   const host: string =
@@ -254,7 +309,7 @@ export function createClient(conf: ClientConfig): DynamoDBClient {
 
   const endpoint: string = `http${
     conf.region === "local" ? "" : "s"
-  }://${host}:${conf.port || 8000}/`;
+  }://${host}:${conf.port || 80}/`;
 
   const _conf: Doc = {
     ...conf,
@@ -264,11 +319,11 @@ export function createClient(conf: ClientConfig): DynamoDBClient {
     endpoint
   };
 
-  const ddbc: DynamoDBClient = {} as DynamoDBClient;
+  const dyno: DynamoDBClient = {} as DynamoDBClient;
 
   for (const op of OPS) {
-    ddbc[camelCase(op)] = baseOp.bind(null, _conf, op);
+    dyno[camelCase(op)] = baseOp.bind(null, _conf, op);
   }
 
-  return ddbc;
+  return dyno;
 }
