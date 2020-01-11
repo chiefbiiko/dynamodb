@@ -24,10 +24,9 @@ export interface DynamoDBClient {
 
 /** Credentials. */
 export interface Credentials {
-    accessKeyId: string; // AKIAIOSFODNN7EXAMPLE
-    secretAccessKey: string; // wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-    sessionToken?: string; // somesessiontoken
-    region?: string; // us-west-2
+  accessKeyId: string; // AKIAIOSFODNN7EXAMPLE
+  secretAccessKey: string; // wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  sessionToken?: string; // somesessiontoken
 }
 
 /** Client configuration. */
@@ -107,66 +106,38 @@ function createCache(conf: ClientConfig): Doc {
     _accessKeyId: "",
     _sessionToken: "",
     async refresh(): Promise<void> {
-        const dateStamp: string = date.format(new Date(), "dateStamp");
-        
-        let credentials: Credentials
-        
-        if (typeof conf.credentials === "function") {
-           credentials= await conf.credentials();
-        } else {
-          credentials = conf.credentials
-        }
-        
-        this._key = kdf(
-          credentials.secretAccessKey,
-          dateStamp,
-          credentials.region,
-          SERVICE
-        ) as Uint8Array;
+      const dateStamp: string = date.format(new Date(), "dateStamp");
 
-        this._credentialScope = `${dateStamp}/${credentials.region}/${SERVICE}/aws4_request`;
-        this._accessKeyId = credentials.accessKeyId
-        this._sessionToken = credentials.sessionToken
+      let credentials: Credentials;
+
+      if (typeof conf.credentials === "function") {
+        credentials = await conf.credentials();
+      } else {
+        credentials = conf.credentials;
+      }
+
+      this._key = kdf(
+        credentials.secretAccessKey,
+        dateStamp,
+        conf.region,
+        SERVICE
+      ) as Uint8Array;
+
+      this._credentialScope = `${dateStamp}/${conf.region}/${SERVICE}/aws4_request`;
+      this._accessKeyId = credentials.accessKeyId;
+      this._sessionToken = credentials.sessionToken;
     },
-    // async _maybeRefresh(forceRefresh: boolean = false): Promise<void> {
-      // const d: Date = new Date();
-      // const day: string = d.toISOString().slice(8, 10);
-      // 
-      // if (forceRefresh || this._day !== day) {
-      //   // the key and credentialScope values are obsolete or refresh forced
-      //   const dateStamp: string = date.format(d, "dateStamp");
-      // 
-      //   let credentials: Credentials
-      // 
-      //   if (typeof conf.credentials === "function") {
-      //      credentials= await conf.credentials();
-      //   } else {
-      //     credentials = conf.credentials
-      //   }
-      // 
-      //   this._key = kdf(
-      //     credentials.secretAccessKey,
-      //     dateStamp,
-      //     credentials.region,
-      //     SERVICE
-      //   ) as Uint8Array;
-      // 
-      //   this._credentialScope = `${dateStamp}/${credentials.region}/${SERVICE}/aws4_request`;
-      // 
-      //   this._day = day;
-      // }
-    // },
     get key(): Uint8Array {
-       return this._key;
+      return this._key;
     },
     get credentialScope(): string {
       return this._credentialScope;
     },
     get accessKeyId(): string {
-      return this._accessKeyId
+      return this._accessKeyId;
     },
     get sessionToken(): string {
-      return this._sessionToken
+      return this._sessionToken;
     }
   };
 }
@@ -175,16 +146,20 @@ function createCache(conf: ClientConfig): Doc {
 async function baseFetch(conf: Doc, op: string, params: Doc): Promise<Doc> {
   const payload: Uint8Array = encode(JSON.stringify(params), "utf8");
 
-  let headers: Headers = await createHeaders(op, payload, conf as HeadersConfig);
+  let headers: Headers = await createHeaders(
+    op,
+    payload,
+    conf as HeadersConfig
+  );
 
   let response: Response = await fetch(conf.endpoint, {
     method: conf.method,
     headers,
     body: payload
   });
-  
+
   let body: Doc = await response.json();
-  
+
   if (!response.ok) {
     if (response.status === 403) {
       // retry once with refreshed credenttials
@@ -195,17 +170,17 @@ async function baseFetch(conf: Doc, op: string, params: Doc): Promise<Doc> {
         headers,
         body: payload
       });
-      
+
       if (response.ok) {
         body = await response.json();
-        
-        return body
+
+        return body;
       }
     }
-    
+
     throw new Error(body.message);
   }
-  
+
   return body;
 }
 
@@ -298,10 +273,6 @@ async function baseOp(
 
 /** Creates a DynamoDB client. */
 export function createClient(conf: ClientConfig): DynamoDBClient {
-  if (!conf.credentials) {
-    throw new TypeError("client config must include credentials");
-  }
-
   const host: string =
     conf.region === "local"
       ? "localhost"

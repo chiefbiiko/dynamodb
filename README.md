@@ -1,4 +1,3 @@
-
 # dynamodb
 
 ![ci](https://github.com/chiefbiiko/dynamodb/workflows/ci/badge.svg)
@@ -10,10 +9,13 @@ DynamoDB client.
 ``` ts
 import { createClient } from "https://denopkg.com/chiefbiiko/dynamodb/mod.ts";
 
-// minimal config to create a client - u can use temp creds with a session token
+// minimal config to create a client
+// can temp creds with a session token 2 or pass credentials as a (n async) func
 const conf = {
-  accessKeyId: "abc",
-  secretAccessKey: "def",
+  credentials: {
+    accessKeyId: "abc",
+    secretAccessKey: "def",
+  },
   region: "local"
 }
 
@@ -23,6 +25,8 @@ const dyno = createClient(conf);
 // imagine a world with top-level await
 const result = await dyno.listTables();
 ```
+
+Prefer using temporary credentials and a session token.
 
 ## API
 
@@ -130,14 +134,19 @@ export interface DynamoDBClient {
   [key: string]: (params: Doc, options?: Doc) => Promise<Doc>;
 }
 
-/** Client configuration. */
-export interface ClientConfig {
+/** Credentials. */
+export interface Credentials {
   accessKeyId: string; // AKIAIOSFODNN7EXAMPLE
   secretAccessKey: string; // wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  sessionToken?: string; // somesessiontoken
+}
+
+/** Client configuration. */
+export interface ClientConfig {
+  credentials: Credentials | (() => Credentials | Promise<Credentials>);
   region: string; // us-west-2
   canonicalUri?: string; // fx /path/to/somewhere
   port?: number; // 80
-  sessionToken?: () => string | Promise<string>; // fx aws sts get-session-token
 }
 
 /** Op options. */
@@ -388,4 +397,3 @@ Don't want to do all development against the real AWS cloud?
 ## License
 
 [MIT](./LICENSE)
-

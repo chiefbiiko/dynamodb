@@ -4,16 +4,23 @@ import {
   assertEquals,
   assertThrowsAsync
 } from "https://deno.land/std@v0.26.0/testing/asserts.ts";
+import {
+  ClientConfig,
+  Credentials,
+  DynamoDBClient,
+  createClient
+} from "./mod.ts";
 import { encode } from "./deps.ts";
 import { awsSignatureV4, kdf } from "./client/mod.ts";
-import { ClientConfig, DynamoDBClient, createClient } from "./mod.ts";
 import { Doc } from "./util.ts";
 
 const ENV: Doc = Deno.env();
 
 const CONF: ClientConfig = {
-  accessKeyId: ENV.ACCESS_KEY_ID,
-  secretAccessKey: ENV.SECRET_ACCESS_KEY,
+  credentials: {
+    accessKeyId: ENV.AWS_ACCESS_KEY_ID,
+    secretAccessKey: ENV.AWS_SECRET_ACCESS_KEY
+  },
   region: "local",
   port: 8000 // DynamoDB Local's default port
 };
@@ -434,18 +441,47 @@ test({
 });
 
 test({
-  name: "test security token can be passed",
+  name: "passing temporary credentials including a session token",
   async fn(): Promise<void> {
-    // currently there's no way to test this is appended to the header
-    // but we include it in the ClientConfig.
+    // currently there's no way to test the session token is appended to the
+    // header but we include it in the ClientConfig
     const conf: ClientConfig = {
-      accessKeyId: ENV.ACCESS_KEY_ID,
-      secretAccessKey: ENV.SECRET_ACCESS_KEY,
+      credentials: {
+        accessKeyId: "freshAccessKeyId",
+        secretAccessKey: "freshAccessKey",
+        sessionToken: "freshSessionToken"
+      },
       region: "local",
-      sessionToken: () => "test"
+      port: 8000 // DynamoDB Local's default port
     };
+
     const dyno: DynamoDBClient = createClient(conf);
-    const result: Doc = await dyno.listTables();
+
+    await dyno.listTables();
+  }
+});
+
+test({
+  name: "having temporary credentials refreshed",
+  async fn(): Promise<void> {
+    // 2 have temp credentials refreshed pass a (n async) credentials func
+    // this will refresh creds after recv a 403 and then retry once
+    const conf: ClientConfig = {
+      async credentials(): Credentials {
+        // call STS AssumeRole GetSessionToken or similar...
+        return {
+          accessKeyId: "freshAccessKeyId",
+          secretAccessKey: "freshAccessKey",
+          sessionToken: "freshSessionToken"
+        };
+      },
+      region: "local",
+      port: 8000 // DynamoDB Local's default port
+    };
+
+    const dyno: DynamoDBClient = createClient(conf);
+
+    await dyno.listTables();
   }
 });
 
