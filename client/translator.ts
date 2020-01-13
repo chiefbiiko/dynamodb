@@ -62,19 +62,17 @@ Translator.prototype.translateStructure = function(
 
   const struct: Doc = {};
   // util.each(structure, function(name, value) {
-  Object.entries(structure).forEach(
-    ([name, value]: [string, any]): void => {
-      const memberShape: any = shape.members[name];
+  Object.entries(structure).forEach(([name, value]: [string, any]): void => {
+    const memberShape: any = shape.members[name];
 
-      if (memberShape) {
-        const result: any = self.translate(value, memberShape);
+    if (memberShape) {
+      const result: any = self.translate(value, memberShape);
 
-        if (result !== undefined) {
-          struct[name] = result;
-        }
+      if (result !== undefined) {
+        struct[name] = result;
       }
     }
-  );
+  });
 
   return struct;
 };
@@ -86,17 +84,15 @@ Translator.prototype.translateList = function(list: any[], shape: any): any[] {
     return undefined;
   }
 
-  return list.map(
-    (value: any): any => {
-      const result: any = self.translate(value, shape.member);
+  return list.map((value: any): any => {
+    const result: any = self.translate(value, shape.member);
 
-      if (result === undefined) {
-        return null;
-      } else {
-        return result;
-      }
+    if (result === undefined) {
+      return null;
+    } else {
+      return result;
     }
-  );
+  });
 
   // var out = [];
   // // util.arrayEach(list, function(value) {

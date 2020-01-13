@@ -14,4 +14,4 @@ jobs:
       - name: start a local dynamodb
         run: curl -fsSL https://denopkg.com/chiefbiiko/dynamodb@v0.2.0/start_db.sh | bash
       - name: run tests
-        run: AWS_ACCESS_KEY_ID=fraud AWS_SECRET_ACCESS_KEY=fraud AWS_SESSION_TOKEN=fraud deno run --allow-env --allow-net ./test.ts
+        run: deno run --allow-env --allow-net ./test.ts

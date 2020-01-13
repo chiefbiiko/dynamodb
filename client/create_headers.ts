@@ -25,26 +25,22 @@ export async function createHeaders(
   refreshCredentials: boolean = false
 ): Promise<Headers> {
   if (refreshCredentials) {
-  await  conf.cache.refresh()
+    await conf.cache.refresh();
   }
-  
+
   const amzTarget: string = `DynamoDB_20120810.${op}`;
 
   const amzDate: string = date.format(conf.date || new Date(), "amz");
 
   const canonicalUri: string = conf.canonicalUri || "/";
 
-  const canonicalHeaders: string = `content-type:${POST_CONTENT_TYPE}\nhost:${
-    conf.host
-  }\nx-amz-date:${amzDate}\nx-amz-target:${amzTarget}\n`;
+  const canonicalHeaders: string = `content-type:${POST_CONTENT_TYPE}\nhost:${conf.host}\nx-amz-date:${amzDate}\nx-amz-target:${amzTarget}\n`;
 
   const signedHeaders: string = "content-type;host;x-amz-date;x-amz-target";
 
   const payloadHash: string = sha256(payload, null, "hex") as string;
 
-  const canonicalRequest: string = `${
-    conf.method
-  }\n${canonicalUri}\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
+  const canonicalRequest: string = `${conf.method}\n${canonicalUri}\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
 
   const canonicalRequestDigest: string = sha256(
     canonicalRequest,
@@ -53,9 +49,7 @@ export async function createHeaders(
   ) as string;
 
   const msg: Uint8Array = encode(
-    `${ALGORITHM}\n${amzDate}\n${
-      conf.cache.credentialScope
-    }\n${canonicalRequestDigest}`,
+    `${ALGORITHM}\n${amzDate}\n${conf.cache.credentialScope}\n${canonicalRequestDigest}`,
     "utf8"
   );
 
@@ -65,11 +59,7 @@ export async function createHeaders(
     "hex"
   ) as string;
 
-  const authorizationHeader: string = `${ALGORITHM} Credential=${
-    conf.cache.accessKeyId
-  }/${
-    conf.cache.credentialScope
-  }, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+  const authorizationHeader: string = `${ALGORITHM} Credential=${conf.cache.accessKeyId}/${conf.cache.credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
   const headers = new Headers({
     "Content-Type": POST_CONTENT_TYPE,
@@ -83,5 +73,5 @@ export async function createHeaders(
     headers.append("X-Amz-Security-Token", conf.cache.sessionToken);
   }
 
-  return headers
+  return headers;
 }

@@ -215,8 +215,8 @@ export class Converter {
         //   list.push(Converter.output(values[i], options));
         // }
         // return list;
-        return values.map(
-          (value: any): any => Converter.output(value, options)
+        return values.map((value: any): any =>
+          Converter.output(value, options)
         );
       } else if (type === "SS") {
         // list = [];
@@ -232,8 +232,8 @@ export class Converter {
         // }
         // return new DynamoDBSet(list);
         return new DynamoDBSet(
-          values.map(
-            (value: any): number => convertNumber(value, options.wrapNumbers)
+          values.map((value: any): number =>
+            convertNumber(value, options.wrapNumbers)
           )
         );
       } else if (type === "BS") {
