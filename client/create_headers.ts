@@ -60,7 +60,7 @@ export async function createHeaders(
   );
 
   const signature: string = awsSignatureV4(
-    conf.cache.key,
+    conf.cache.signingKey,
     msg,
     "hex"
   ) as string;

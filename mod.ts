@@ -1,7 +1,7 @@
 import { encode } from "./deps.ts";
 import { API } from "./api/mod.ts";
-import { HeadersConfig, Translator, createHeaders, kdf } from "./client/mod.ts";
-import { Doc, camelCase, date } from "./util.ts";
+import { HeadersConfig, Translator, createHeaders, deriveConfig } from "./client/mod.ts";
+import { Doc, camelCase } from "./util.ts";
 
 /** Convenience export. */
 export { Doc } from "./util.ts";
@@ -31,8 +31,9 @@ export interface Credentials {
 
 /** Client configuration. */
 export interface ClientConfig {
-  credentials: Credentials | (() => Credentials | Promise<Credentials>);
-  region: string; // us-west-2
+  credentials?: Credentials | (() => Credentials | Promise<Credentials>);
+  region?: string; // us-west-2
+  profile?: string; // default
   canonicalUri?: string; // fx /path/to/somewhere
   port?: number; // 80
 }
@@ -91,75 +92,24 @@ export const NO_PARAMS_OPS: Set<string> = new Set<string>([
   "ListTables"
 ]);
 
-/** Service name. */
-const SERVICE: string = "dynamodb";
-
 /** Base shape of all DynamoDB query schemas. */
 const ATTR_VALUE: string =
   API.operations.PutItem.input.members.Item.value.shape;
-
-/** Cache for credentialScope and expensive signature key. */
-function createCache(conf: ClientConfig): Doc {
-  return {
-    _credentialScope: "",
-    _key: null,
-    _accessKeyId: "",
-    _sessionToken: "",
-    async refresh(): Promise<void> {
-      const dateStamp: string = date.format(new Date(), "dateStamp");
-
-      let credentials: Credentials;
-
-      if (typeof conf.credentials === "function") {
-        credentials = await conf.credentials();
-      } else {
-        credentials = conf.credentials;
-      }
-
-      this._key = kdf(
-        credentials.secretAccessKey,
-        dateStamp,
-        conf.region,
-        SERVICE
-      ) as Uint8Array;
-
-      this._credentialScope = `${dateStamp}/${conf.region}/${SERVICE}/aws4_request`;
-      this._accessKeyId = credentials.accessKeyId;
-      this._sessionToken = credentials.sessionToken;
-    },
-    get key(): Uint8Array {
-      return this._key;
-    },
-    get credentialScope(): string {
-      return this._credentialScope;
-    },
-    get accessKeyId(): string {
-      return this._accessKeyId;
-    },
-    get sessionToken(): string {
-      return this._sessionToken;
-    }
-  };
-}
 
 /** Base fetch. */
 async function baseFetch(conf: Doc, op: string, params: Doc): Promise<Doc> {
   const payload: Uint8Array = encode(JSON.stringify(params), "utf8");
 
-  let headers: Headers = await createHeaders(
-    op,
-    payload,
-    conf as HeadersConfig
-  );
+  let headers: Headers = await createHeaders(op, payload, conf as HeadersConfig);
 
   let response: Response = await fetch(conf.endpoint, {
     method: conf.method,
     headers,
     body: payload
   });
-
+  
   let body: Doc = await response.json();
-
+  
   if (!response.ok) {
     if (response.status === 403) {
       // retry once with refreshed credenttials
@@ -170,17 +120,17 @@ async function baseFetch(conf: Doc, op: string, params: Doc): Promise<Doc> {
         headers,
         body: payload
       });
-
+      
       if (response.ok) {
         body = await response.json();
-
-        return body;
+        
+        return body
       }
     }
-
+    
     throw new Error(body.message);
   }
-
+  
   return body;
 }
 
@@ -272,24 +222,9 @@ async function baseOp(
 }
 
 /** Creates a DynamoDB client. */
-export function createClient(conf: ClientConfig): DynamoDBClient {
-  const host: string =
-    conf.region === "local"
-      ? "localhost"
-      : `dynamodb.${conf.region}.amazonaws.com`;
-
-  const endpoint: string = `http${
-    conf.region === "local" ? "" : "s"
-  }://${host}:${conf.port || 80}/`;
-
-  const _conf: Doc = {
-    ...conf,
-    cache: createCache(conf),
-    method: "POST",
-    host,
-    endpoint
-  };
-
+export function createClient(conf?: ClientConfig): DynamoDBClient {
+  const _conf: Doc = deriveConfig(conf)
+  
   const dyno: DynamoDBClient = {} as DynamoDBClient;
 
   for (const op of OPS) {
