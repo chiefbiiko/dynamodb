@@ -12,7 +12,7 @@ export interface OpOptions {
 }
 
 /** DynamoDB operations that do not take any parameters. */
-const NO_PARAMS_OPS: Set<string> = new Set<string>([
+export const NO_PARAMS_OPS: Set<string> = new Set<string>([
   "DescribeEndpoints",
   "DescribeLimits",
   "ListTables"

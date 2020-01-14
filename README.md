@@ -143,8 +143,9 @@ export interface Credentials {
 
 /** Client configuration. */
 export interface ClientConfig {
-  credentials: Credentials | (() => Credentials | Promise<Credentials>);
-  region: string; // us-west-2
+  credentials?: Credentials | (() => Credentials | Promise<Credentials>);
+  region?: string; // us-west-2
+  profile?: string; // default
   canonicalUri?: string; // fx /path/to/somewhere
   port?: number; // 80
 }

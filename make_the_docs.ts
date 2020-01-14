@@ -1,4 +1,5 @@
-import { OPS, NO_PARAMS_OPS } from "./mod.ts";
+import { OPS } from "./mod.ts";
+import { NO_PARAMS_OPS } from "./client/base_op.ts";
 import { Doc } from "./util.ts";
 
 const README0: string = `
@@ -71,8 +72,9 @@ export interface Credentials {
 
 /** Client configuration. */
 export interface ClientConfig {
-  credentials: Credentials | (() => Credentials | Promise<Credentials>);
-  region: string; // us-west-2
+  credentials?: Credentials | (() => Credentials | Promise<Credentials>);
+  region?: string; // us-west-2
+  profile?: string; // default
   canonicalUri?: string; // fx /path/to/somewhere
   port?: number; // 80
 }
