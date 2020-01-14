@@ -50,8 +50,8 @@ export function Operation(name: string, operation: Doc, options: Doc = {}) {
       return null;
     }
 
-    return operation.errors.map(
-      (error: any): any => Shape.create(error, options)
+    return operation.errors.map((error: any): any =>
+      Shape.create(error, options)
     );
 
     // const list: any[] = [];

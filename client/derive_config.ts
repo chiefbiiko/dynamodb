@@ -1,4 +1,4 @@
-import { get } from "https://denopkg.com/chiefbiiko/get-aws-config/mod.ts";
+import { get } from "../deps.ts";
 import { ClientConfig } from "../mod.ts";
 import { Doc } from "../util.ts";
 import { createCache } from "./create_cache.ts";
