@@ -26,6 +26,8 @@ const dyno = createClient(conf);
 const result = await dyno.listTables();
 ```
 
+The client config can be omitted entirely when calling `createClient`. If that is the case the config will be derived from the environment and filesystem, in that order.
+
 Prefer using temporary credentials and a session token.
 
 ## API
