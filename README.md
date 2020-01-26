@@ -1,6 +1,6 @@
 # dynamodb
 
-![ci](https://github.com/chiefbiiko/dynamodb/workflows/ci/badge.svg)
+![local ci](https://github.com/chiefbiiko/dynamodb/workflows/local_ci/badge.svg) ![cloud ci](https://github.com/chiefbiiko/dynamodb/workflows/cloud_ci/badge.svg)
 
 DynamoDB client.
 
