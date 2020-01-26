@@ -14,22 +14,10 @@ import {
 } from "../mod.ts";
 import { Doc } from "../util.ts";
 
-const env: Doc = Deno.env();
-
-const CONF: ClientConfig = {
-  credentials: {
-    accessKeyId: env.AWS_ACCESS_KEY_ID || "DynamoDBLocal",
-    secretAccessKey: env.AWS_SECRET_ACCESS_KEY || "DoesNotDoAnyAuth",
-    sessionToken: env.AWS_SESSION_TOKEN || "preferTemporaryCredentials"
-  },
-  region: "local",
-  port: 8000 // DynamoDB Local's default port
-};
-
 test({
   name: "schema translation enabled by default",
   async fn(): Promise<void> {
-    const dyno: DynamoDBClient = createClient(CONF);
+    const dyno: DynamoDBClient = createClient();
 
     let result: Doc = await dyno.listTables();
 
@@ -71,7 +59,7 @@ test({
 test({
   name: "opt-in raw queries",
   async fn(): Promise<void> {
-    const dyno: DynamoDBClient = createClient(CONF);
+    const dyno: DynamoDBClient = createClient();
 
     let result: Doc = await dyno.listTables();
 
@@ -135,7 +123,7 @@ test({
 test({
   name: "batch write items",
   async fn(): Promise<void> {
-    const dyno: DynamoDBClient = createClient(CONF);
+    const dyno: DynamoDBClient = createClient();
 
     let result: Doc = await dyno.listTables();
 
@@ -190,7 +178,7 @@ test({
 test({
   name: "storing a binary value",
   async fn(): Promise<void> {
-    const dyno: DynamoDBClient = createClient(CONF);
+    const dyno: DynamoDBClient = createClient();
 
     let result: Doc = await dyno.listTables();
 
@@ -241,7 +229,7 @@ test({
 test({
   name: "ops that receive paged results return an async iterator by default",
   async fn(): Promise<void> {
-    const dyno: DynamoDBClient = createClient(CONF);
+    const dyno: DynamoDBClient = createClient();
 
     let result: Doc = await dyno.listTables();
 
@@ -323,7 +311,7 @@ test({
 test({
   name: "handling pagination manually",
   async fn(): Promise<void> {
-    const dyno: DynamoDBClient = createClient(CONF);
+    const dyno: DynamoDBClient = createClient();
 
     let result: Doc = await dyno.listTables();
 
@@ -394,7 +382,7 @@ test({
 test({
   name: "missing table throws a readable error",
   async fn(): Promise<void> {
-    const dyno: DynamoDBClient = createClient(CONF);
+    const dyno: DynamoDBClient = createClient();
 
     let result: Doc = await dyno.listTables();
 
