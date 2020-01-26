@@ -3,8 +3,18 @@ name: ci
 on: [push, pull_request, release]
 
 jobs:
-  test:
-    name: test dynamodb
+  test_signv4:
+    name: test dynamodb signature v4
+    runs-on: ubuntu-latest
+    steps:
+      - name: clone repo
+        uses: actions/checkout@v1.0.0
+      - name: install deno
+        uses: denolib/setup-deno@v1.1.0
+      - name: run tests
+        run: deno run ./test/signv4.ts
+  test_local:
+    name: test dynamodb local
     runs-on: ubuntu-latest
     steps:
       - name: clone repo
@@ -14,4 +24,22 @@ jobs:
       - name: start a local dynamodb
         run: curl -fsSL https://denopkg.com/chiefbiiko/dynamodb@v0.2.0/start_db.sh | bash
       - name: run tests
-        run: deno run --allow-env --allow-net ./test.ts
+        run: deno run --allow-env --allow-net ./test/local.ts
+  test_cloud:
+    name: test dynamodb cloud
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-1
+    steps:
+      - name: clone repo
+        uses: actions/checkout@v1.0.0
+      - name: install deno
+        uses: denolib/setup-deno@v1.1.0
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: run tests
+        run: deno run --allow-env --allow-net ./test/cloud.ts

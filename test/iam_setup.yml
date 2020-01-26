@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: IAM setup for testing dynamodb in the AWS cloud
+Resources:
+  User:
+    Type: AWS::IAM::User
+    Properties:
+      Policies:
+        - PolicyName: DynamoDBTestingPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: AllowDynamoDBFullAccess
+                Effect: Allow
+                Action: dynamodb:*
+                Resource: !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/*
+  AccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      Status: Active
+      UserName: !Ref User
+Outputs:
+  UserArn:
+    Description: IAM user with full access to DynamoDB
+    Value: !GetAtt User.Arn
+  UserAccessKeyId:
+    Description: Access key id of the IAM user
+    Value: !Ref AccessKey
+  UserSecretAccessKey:
+    Description: Secret access key of the IAM user
+    Value: !GetAtt AccessKey.SecretAccessKey
