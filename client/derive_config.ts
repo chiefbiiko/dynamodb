@@ -10,6 +10,7 @@ export function deriveConfig(conf: ClientConfig = {}): Doc {
   if (
     _conf.profile ||
     !_conf.region ||
+    !_conf.credentials ||
     (typeof _conf.credentials !== "function" &&
       (!_conf.credentials.accessKeyId || !_conf.credentials.secretAccessKey))
   ) {
