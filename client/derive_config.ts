@@ -17,7 +17,7 @@ export function deriveConfig(conf: ClientConfig = {}): Doc {
     const got: Doc = get({ profile: _conf.profile || "default" });
 
     if (typeof _conf.credentials !== "function") {
-      _conf.credentials = { ...got.credentials, ..._conf.credentials };
+      _conf.credentials = { ...got.credentials, ..._conf.credentials, accessKeyId: got.accessKeyId, secretAccessKey: got.secretAccessKey  };
     }
 
     _conf.region = got.region;
@@ -25,10 +25,10 @@ export function deriveConfig(conf: ClientConfig = {}): Doc {
     if (
       typeof _conf.credentials !== "function" &&
       (!_conf.region ||
-        !_conf.accessKeyId ||
-        !_conf.secretAccessKey)
+        !_conf.credentials.accessKeyId ||
+        !_conf.credentials.secretAccessKey)
     ) {
-      console.error(_conf.region, _conf.accessKeyId, _conf.secretAccessKey);
+      console.error(_conf.region, _conf.credentials.accessKeyId, _conf.credentials.secretAccessKey);
       throw new Error("unable to derive aws config");
     }
   }
