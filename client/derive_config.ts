@@ -17,7 +17,12 @@ export function deriveConfig(conf: ClientConfig = {}): Doc {
     const got: Doc = get({ profile: _conf.profile || "default" });
 
     if (typeof _conf.credentials !== "function") {
-      _conf.credentials = { ...got.credentials, ..._conf.credentials };
+      _conf.credentials = {
+        accessKeyId: got.accessKeyId,
+        secretAccessKey: got.secretAccessKey,
+        sessionToken: got.sessionToken,
+        ..._conf.credentials
+      };
     }
 
     _conf.region = got.region;
