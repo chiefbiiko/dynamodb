@@ -25,8 +25,8 @@ export function deriveConfig(conf: ClientConfig = {}): Doc {
     if (
       typeof _conf.credentials !== "function" &&
       (!_conf.region ||
-        !_conf.credentials.accessKeyId ||
-        !_conf.credentials.secretAccessKey)
+        !_conf.accessKeyId ||
+        !_conf.secretAccessKey)
     ) {
       throw new Error("unable to derive aws config");
     }
