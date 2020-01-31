@@ -44,7 +44,7 @@ export function deriveConfig(conf: ClientConfig = {}): Doc {
 
   const endpoint: string = `http${
     _conf.region === "local" ? "" : "s"
-  }://${host}:${_conf.port || 80}/`;
+  }://${host}:${_conf.port || 443}/`;
 
   return {
     ..._conf,
