@@ -6,23 +6,13 @@ DynamoDB client.
 
 ## Usage
 
-``` ts
+```ts
 import { createClient } from "https://denopkg.com/chiefbiiko/dynamodb/mod.ts";
 
-// minimal config to create a client
-// can temp creds with a session token 2 or pass credentials as a (n async) func
-const conf = {
-  credentials: {
-    accessKeyId: "abc",
-    secretAccessKey: "def",
-  },
-  region: "local"
-}
+// if no config/credentials are passed they will be derived from the env/fs
+const dyno = createClient();
 
 // the client has all of DynamoDB's operations as camelCased async methods
-const dyno = createClient(conf);
-
-// imagine a world with top-level await
 const result = await dyno.listTables();
 ```
 
@@ -40,81 +30,81 @@ Prefer using temporary credentials and a session token.
 
 3. [Ops](#Ops)
 
-    + [BatchGetItem](#BatchGetItem)
+   - [BatchGetItem](#BatchGetItem)
 
-    + [BatchWriteItem](#BatchWriteItem)
+   - [BatchWriteItem](#BatchWriteItem)
 
-    + [CreateBackup](#CreateBackup)
+   - [CreateBackup](#CreateBackup)
 
-    + [CreateGlobalTable](#CreateGlobalTable)
+   - [CreateGlobalTable](#CreateGlobalTable)
 
-    + [CreateTable](#CreateTable)
+   - [CreateTable](#CreateTable)
 
-    + [DeleteBackup](#DeleteBackup)
+   - [DeleteBackup](#DeleteBackup)
 
-    + [DeleteItem](#DeleteItem)
+   - [DeleteItem](#DeleteItem)
 
-    + [DeleteTable](#DeleteTable)
+   - [DeleteTable](#DeleteTable)
 
-    + [DescribeBackup](#DescribeBackup)
+   - [DescribeBackup](#DescribeBackup)
 
-    + [DescribeContinuousBackups](#DescribeContinuousBackups)
+   - [DescribeContinuousBackups](#DescribeContinuousBackups)
 
-    + [DescribeEndpoints](#DescribeEndpoints)
+   - [DescribeEndpoints](#DescribeEndpoints)
 
-    + [DescribeGlobalTable](#DescribeGlobalTable)
+   - [DescribeGlobalTable](#DescribeGlobalTable)
 
-    + [DescribeGlobalTableSettings](#DescribeGlobalTableSettings)
+   - [DescribeGlobalTableSettings](#DescribeGlobalTableSettings)
 
-    + [DescribeLimits](#DescribeLimits)
+   - [DescribeLimits](#DescribeLimits)
 
-    + [DescribeTable](#DescribeTable)
+   - [DescribeTable](#DescribeTable)
 
-    + [DescribeTimeToLive](#DescribeTimeToLive)
+   - [DescribeTimeToLive](#DescribeTimeToLive)
 
-    + [GetItem](#GetItem)
+   - [GetItem](#GetItem)
 
-    + [ListBackups](#ListBackups)
+   - [ListBackups](#ListBackups)
 
-    + [ListGlobalTables](#ListGlobalTables)
+   - [ListGlobalTables](#ListGlobalTables)
 
-    + [ListTables](#ListTables)
+   - [ListTables](#ListTables)
 
-    + [ListTagsOfResource](#ListTagsOfResource)
+   - [ListTagsOfResource](#ListTagsOfResource)
 
-    + [PutItem](#PutItem)
+   - [PutItem](#PutItem)
 
-    + [Query](#Query)
+   - [Query](#Query)
 
-    + [RestoreTableFromBackup](#RestoreTableFromBackup)
+   - [RestoreTableFromBackup](#RestoreTableFromBackup)
 
-    + [RestoreTableToPointInTime](#RestoreTableToPointInTime)
+   - [RestoreTableToPointInTime](#RestoreTableToPointInTime)
 
-    + [Scan](#Scan)
+   - [Scan](#Scan)
 
-    + [TagResource](#TagResource)
+   - [TagResource](#TagResource)
 
-    + [TransactGetItems](#TransactGetItems)
+   - [TransactGetItems](#TransactGetItems)
 
-    + [TransactWriteItems](#TransactWriteItems)
+   - [TransactWriteItems](#TransactWriteItems)
 
-    + [UntagResource](#UntagResource)
+   - [UntagResource](#UntagResource)
 
-    + [UpdateContinuousBackups](#UpdateContinuousBackups)
+   - [UpdateContinuousBackups](#UpdateContinuousBackups)
 
-    + [UpdateGlobalTable](#UpdateGlobalTable)
+   - [UpdateGlobalTable](#UpdateGlobalTable)
 
-    + [UpdateGlobalTableSettings](#UpdateGlobalTableSettings)
+   - [UpdateGlobalTableSettings](#UpdateGlobalTableSettings)
 
-    + [UpdateItem](#UpdateItem)
+   - [UpdateItem](#UpdateItem)
 
-    + [UpdateTable](#UpdateTable)
+   - [UpdateTable](#UpdateTable)
 
-    + [UpdateTimeToLive](#UpdateTimeToLive)
+   - [UpdateTimeToLive](#UpdateTimeToLive)
 
 ### Basics
 
-``` ts
+```ts
 /** Generic document. */
 export interface Doc {
   [key: string]: any;
@@ -149,15 +139,15 @@ export interface ClientConfig {
   region?: string; // us-west-2
   profile?: string; // default
   canonicalUri?: string; // fx /path/to/somewhere
-  port?: number; // 80
+  port?: number; // 443
 }
 
 /** Op options. */
 export interface OpOptions {
-  wrapNumbers?: boolean, // wrap numbers to a special number value type? [false]
-  convertEmptyValues?: boolean, // convert empty strings and binaries? [false]
-  translateJSON?: boolean, // translate I/O JSON schemas? [true]
-  iteratePages?: boolean // if a result is paged, async-iterate it? [true]
+  wrapNumbers?: boolean; // wrap numbers to a special number value type? [false]
+  convertEmptyValues?: boolean; // convert empty strings and binaries? [false]
+  translateJSON?: boolean; // translate I/O JSON schemas? [true]
+  iteratePages?: boolean; // if a result is paged, async-iterate it? [true]
 }
 ```
 
@@ -393,9 +383,9 @@ The client supports all DynamoDB operations. Check the linked aws docs for info 
 
 Don't want to do all development against the real AWS cloud?
 
-+ [DynamoDB Local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html)
+- [DynamoDB Local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html)
 
-+ [DynamoDB GUI](https://github.com/Arattian/DynamoDb-GUI-Client)
+- [DynamoDB GUI](https://github.com/Arattian/DynamoDb-GUI-Client)
 
 ## License
 
