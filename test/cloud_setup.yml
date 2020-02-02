@@ -1,6 +1,24 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: IAM setup for testing dynamodb in the AWS cloud
+Description: Setup for testing dynamodb in the AWS cloud
+Parameters:
+  TableName:
+    Type: String
+    Description: Name of the DynamoDB testing table
+    Default: testing_table
 Resources:
+  Table:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref TableName
+      KeySchema:
+        - KeyType: HASH
+          AttributeName: id
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      ProvisionedThroughput:
+        ReadCapacityUnits: 10
+        WriteCapacityUnits: 10
   User:
     Type: AWS::IAM::User
     Properties:
@@ -19,6 +37,9 @@ Resources:
       Status: Active
       UserName: !Ref User
 Outputs:
+  TableName:
+    Description: Name of the DynamoDB testing table
+    Value: !Ref TableName
   UserArn:
     Description: IAM user with full access to DynamoDB
     Value: !GetAtt User.Arn

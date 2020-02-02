@@ -5,7 +5,7 @@ import { Doc } from "./util.ts";
 const README0: string = `
 # dynamodb
 
-![local ci](https://github.com/chiefbiiko/dynamodb/workflows/local_ci/badge.svg) ![cloud ci](https://github.com/chiefbiiko/dynamodb/workflows/cloud_ci/badge.svg)
+![local_ci](https://github.com/chiefbiiko/dynamodb/workflows/local_ci/badge.svg) ![cloud_ci](https://github.com/chiefbiiko/dynamodb/workflows/cloud_ci/badge.svg)
 
 DynamoDB client.
 

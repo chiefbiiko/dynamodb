@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AWS_REGION: us-east-1
+      TABLE_NAME: testing_table
     steps:
       - name: clone repo
         uses: actions/checkout@v1.0.0
