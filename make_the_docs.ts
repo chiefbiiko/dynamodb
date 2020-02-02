@@ -14,20 +14,10 @@ DynamoDB client.
 \`\`\` ts
 import { createClient } from "https://denopkg.com/chiefbiiko/dynamodb/mod.ts";
 
-// minimal config to create a client
-// can temp creds with a session token 2 or pass credentials as a (n async) func
-const conf = {
-  credentials: {
-    accessKeyId: "abc",
-    secretAccessKey: "def",
-  },
-  region: "local"
-}
+// if config/credentials not passed they will be read from the env/fs
+const dyno = createClient();
 
 // the client has all of DynamoDB's operations as camelCased async methods
-const dyno = createClient(conf);
-
-// imagine a world with top-level await
 const result = await dyno.listTables();
 \`\`\`
 
