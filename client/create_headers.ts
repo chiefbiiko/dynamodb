@@ -7,7 +7,7 @@ import { ClientConfig } from "../mod.ts";
 const ALGORITHM: string = "AWS4-HMAC-SHA256";
 
 /** Content type header value for POST requests. */
-const POST_CONTENT_TYPE: string = "application/x-amz-json-1.0";
+const CONTENT_TYPE: string = "application/x-amz-json-1.0";
 
 /** Required configuration for assembling headers. */
 export interface HeadersConfig extends ClientConfig {
@@ -22,7 +22,7 @@ export async function createHeaders(
   op: string,
   payload: Uint8Array,
   conf: HeadersConfig,
-  refreshCredentials: boolean = false
+  refreshCredentials: boolean = !conf.cache.signingKey
 ): Promise<Headers> {
   if (refreshCredentials) {
     await conf.cache.refresh();
@@ -34,7 +34,7 @@ export async function createHeaders(
 
   const canonicalUri: string = conf.canonicalUri || "/";
 
-  const canonicalHeaders: string = `content-type:${POST_CONTENT_TYPE}\nhost:${conf.host}\nx-amz-date:${amzDate}\nx-amz-target:${amzTarget}\n`;
+  const canonicalHeaders: string = `content-type:${CONTENT_TYPE}\nhost:${conf.host}\nx-amz-date:${amzDate}\nx-amz-target:${amzTarget}\n`;
 
   const signedHeaders: string = "content-type;host;x-amz-date;x-amz-target";
 
@@ -61,8 +61,8 @@ export async function createHeaders(
 
   const authorizationHeader: string = `${ALGORITHM} Credential=${conf.cache.accessKeyId}/${conf.cache.credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
-  const headers = new Headers({
-    "Content-Type": POST_CONTENT_TYPE,
+  const headers: Headers = new Headers({
+    "Content-Type": CONTENT_TYPE,
     "X-Amz-Date": amzDate,
     "X-Amz-Target": amzTarget,
     Authorization: authorizationHeader
