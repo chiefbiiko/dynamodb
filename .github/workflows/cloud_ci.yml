@@ -26,4 +26,4 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
       - name: run tests
-        run: deno run --allow-env --allow-net ./test/cloud.ts
+        run: deno run --allow-env --allow-read=$HOME/.aws --allow-net ./test/cloud.ts

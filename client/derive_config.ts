@@ -33,7 +33,7 @@ export function deriveConfig(conf: ClientConfig = {}): Doc {
     (typeof _conf.credentials !== "function" &&
       (!_conf.credentials.accessKeyId || !_conf.credentials.secretAccessKey))
   ) {
-    const got: Doc = get({ profile: _conf.profile || "default" });
+    const got: Doc = get({ profile: _conf.profile });
 
     if (typeof _conf.credentials !== "function") {
       _conf.credentials = {
