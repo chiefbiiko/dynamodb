@@ -1,6 +1,6 @@
 # dynamodb
 
-![local_ci](https://github.com/chiefbiiko/dynamodb/workflows/local_ci/badge.svg) ![cloud_ci](https://github.com/chiefbiiko/dynamodb/workflows/cloud_ci/badge.svg)
+![ci](https://github.com/chiefbiiko/dynamodb/workflows/ci/badge.svg?branch=master)
 
 DynamoDB client.
 
@@ -16,7 +16,7 @@ const dyno = createClient();
 const result = await dyno.listTables();
 ```
 
-The client config can be omitted entirely when calling `createClient`. If that is the case the config will be derived from the environment and filesystem, in that order.
+The client config can be omitted entirely when calling `createClient`. If that is the case the config will be derived from the environment and filesystem, in that order, using [`get-aws-config`](https://github.com/chiefbiiko/get-aws-config).
 
 Prefer using temporary credentials and a session token.
 
