@@ -4,7 +4,7 @@ import {
   assertThrowsAsync,
   test,
   runIfMain
-} from "https://deno.land/std/testing/mod.ts";
+} from "https://deno.land/std@v0.32.0/testing/mod.ts";
 
 import { ClientConfig, DynamoDBClient, createClient } from "../mod.ts";
 
@@ -155,7 +155,9 @@ test({
   async fn(): Promise<void> {
     assertThrowsAsync(
       async (): Promise<void> => {
-        await dyno.scan({ TableName: "notatable" });
+        for await (const result of dyno.scan({ TableName: "notatable" })) {
+          return;
+        }
       },
       Error,
       "Cannot do operations on a non-existent table"
@@ -203,7 +205,7 @@ test({
 
     assertEquals(unprocessed, 0);
 
-    const ait: any = await dyno.scan({ TableName: TABLE_NAME });
+    const ait = dyno.scan({ TableName: TABLE_NAME });
 
     let pages: number = 0;
     let items: number = 0;
@@ -226,14 +228,17 @@ test({
   name: "handling pagination manually",
   async fn(): Promise<void> {
     // only fetching 1 page - not async iterating
-    const result: Doc = await dyno.scan(
+    let count = 0;
+    for await (const result of dyno.scan(
       { TableName: TABLE_NAME },
       { iteratePages: false }
-    );
-
-    assert(Array.isArray(result.Items));
-    assert(result.Items.length > 0);
-    assert(!!result.LastEvaluatedKey);
+    )) {
+      assert(Array.isArray(result.Items));
+      assert(result.Items.length > 0);
+      assert(!!result.LastEvaluatedKey);
+      count++;
+    };
+    assertEquals(count, 1)
   }
 });
 
