@@ -297,7 +297,7 @@ The client supports all DynamoDB operations. Check the linked aws docs for info 
 
 #### Query
 
-##### `query(params: Doc, options?: OpOptions): Promise<Doc | AsyncIterableIterator<Doc>>`
+##### `query(params: Doc, options?: OpOptions): AsyncIterable<Doc>`
 
 [aws Query docs](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html)
 
@@ -315,7 +315,7 @@ The client supports all DynamoDB operations. Check the linked aws docs for info 
 
 #### Scan
 
-##### `scan(params: Doc, options?: OpOptions): Promise<Doc | AsyncIterableIterator<Doc>>`
+##### `scan(params: Doc, options?: OpOptions): AsyncIterable<Doc>`
 
 [aws Scan docs](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Scan.html)
 
