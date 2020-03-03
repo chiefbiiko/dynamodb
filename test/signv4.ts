@@ -2,7 +2,7 @@ import {
   assertEquals,
   test,
   runIfMain
-} from "https://deno.land/std/testing/mod.ts";
+} from "https://deno.land/std@v0.32.0/testing/mod.ts";
 
 import { encode } from "../deps.ts";
 import { awsSignatureV4, kdf } from "../client/aws_signature_v4.ts";

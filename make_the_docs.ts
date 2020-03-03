@@ -113,11 +113,9 @@ const { contents, ops }: Doc = Array.from(OPS)
     (op: string, i: number): Doc => {
       const params: string = NO_PARAMS_OPS.has(op) ? "" : "params: Doc, ";
 
-      const rtn: string = `Promise<${
-        op === "Scan" || op === "Query"
-          ? "Doc | AsyncIterableIterator<Doc>"
-          : "Doc"
-      }>`;
+      const rtn: string = (op === "Scan" || op === "Query")
+          ? "AsyncIterable<Doc>"
+          : "Promise<Doc>";
 
       const camel: string = `${op[0].toLowerCase()}${op.slice(1)}`;
 

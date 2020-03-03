@@ -3,7 +3,7 @@ import {
   assertThrowsAsync,
   test,
   runIfMain
-} from "https://deno.land/std/testing/mod.ts";
+} from "https://deno.land/std@v0.32.0/testing/mod.ts";
 
 import {
   ClientConfig,
@@ -145,7 +145,7 @@ test({
   name: "missing table throws a readable error",
   async fn(): Promise<void> {
     assertThrowsAsync(async (): Promise<void> => {
-      await dyno.scan({ TableName: "notatable" });
+      for await (const page of dyno.scan({ TableName: "notatable" })) {};
     }, Error);
   }
 });
