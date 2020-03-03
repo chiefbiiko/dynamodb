@@ -194,12 +194,15 @@ test({
 
     assertEquals(Object.keys(result.UnprocessedItems).length, 0);
 
-    result = await dyno.scan({
+    let count = 0
+    for await (const result of dyno.scan({
       TableName: "users_c",
       Select: "COUNT"
-    });
-
-    assertEquals(result.Count, N);
+    })) {
+      assertEquals(result.Count, N);
+      count += result.Count;
+    }
+    assertEquals(count, N);
 
     result = await dyno.deleteTable({
       TableName: "users_c"
@@ -317,7 +320,7 @@ test({
 
     assertEquals(unprocessed, 0);
 
-    const ait: any = await dyno.scan({ TableName: "users_e" });
+    const ait = dyno.scan({ TableName: "users_e" });
 
     let pages: number = 0;
     let items: number = 0;
@@ -398,12 +401,16 @@ test({
 
     assertEquals(unprocessed, 0);
 
-    // only fetching 1 page - not async iterating
-    result = await dyno.scan({ TableName: "users_f" }, { iteratePages: false });
+    // only one page
+    let count = 0;
+    for await (result of dyno.scan({ TableName: "users_f" }, { iteratePages: false })) {
+      assert(Array.isArray(result.Items));
+      assert(result.Items.length > 0);
+      assert(!!result.LastEvaluatedKey);
+      count++;
+    }
+    assertEquals(count, 1);
 
-    assert(Array.isArray(result.Items));
-    assert(result.Items.length > 0);
-    assert(!!result.LastEvaluatedKey);
 
     result = await dyno.deleteTable({
       TableName: "users_f"
@@ -431,7 +438,8 @@ test({
     }
 
     async function fn(): Promise<void> {
-      await dyno.scan({ TableName: "nonexistent_table" });
+      for await (const result of dyno.scan({ TableName: "nonexistent_table" })){
+      }
     }
 
     assertThrowsAsync(
