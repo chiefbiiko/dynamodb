@@ -1,9 +1,7 @@
 import {
   assertEquals,
   assertThrowsAsync,
-  test,
-  runIfMain
-} from "https://deno.land/std/testing/mod.ts";
+} from "https://deno.land/std@v0.34.0/testing/asserts.ts";
 
 import {
   ClientConfig,
@@ -22,7 +20,7 @@ const TABLE_NAME: string = Deno.env().TABLE_NAME;
 
 const dyno: DynamoDBClient = createClient();
 
-test({
+Deno.test({
   name: "schema translation enabled by default",
   async fn(): Promise<void> {
     const id: string = "abc";
@@ -45,7 +43,7 @@ test({
   }
 });
 
-test({
+Deno.test({
   name: "opt-in raw queries",
   async fn(): Promise<void> {
     const id: string = "def";
@@ -72,7 +70,7 @@ test({
   }
 });
 
-test({
+Deno.test({
   name: "batch write items",
   async fn(): Promise<void> {
     const N: number = 25;
@@ -97,7 +95,7 @@ test({
   }
 });
 
-test({
+Deno.test({
   name: "storing a binary value",
   async fn(): Promise<void> {
     const id: string = "ghi";
@@ -120,7 +118,7 @@ test({
   }
 });
 
-test({
+Deno.test({
   name: "deleting an item",
   async fn(): Promise<void> {
     const id: string = "jkl";
@@ -141,7 +139,7 @@ test({
   }
 });
 
-test({
+Deno.test({
   name: "missing table throws a readable error",
   async fn(): Promise<void> {
     assertThrowsAsync(async (): Promise<void> => {
@@ -150,7 +148,7 @@ test({
   }
 });
 
-test({
+Deno.test({
   name: "TODO: having temporary credentials refreshed",
   async fn(): Promise<void> {
     // 2 have temp credentials refreshed pass a (n async) credentials func
@@ -172,4 +170,4 @@ test({
   }
 });
 
-runIfMain(import.meta, { skip: /TODO/ });
+Deno.runTests({ skip: /TODO/ });

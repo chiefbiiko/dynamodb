@@ -139,6 +139,8 @@ export class Converter {
       // this value has a custom constructor
       return formatMap(data, options);
     }
+    
+    return {}
   }
 
   /**

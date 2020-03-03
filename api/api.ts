@@ -7,10 +7,14 @@ import {
   property /*, string as stringUtil*/
 } from "../util.ts";
 
+// NOTE: 2 run in ts strict-mode (bypassing TS7009)
+const _Collection: any = Collection
+const _Operation: any = Operation
+
 // var Paginator = require('./paginator');
 // var ResourceWaiter = require('./resource_waiter');
 
-export function Api(api: Doc = {}, options: Doc = {}) {
+export function Api(this: any, api: Doc = {}, options: Doc = {}) {
   const self: any = this;
   // api = api || {};
   // options = options || {};
@@ -38,7 +42,7 @@ export function Api(api: Doc = {}, options: Doc = {}) {
       api.metadata.serviceAbbreviation || api.metadata.serviceFullName;
 
     if (!name) {
-      return null;
+      return "";
     }
 
     name = name.replace(/^Amazon|AWS\s*|\(.*|\s+|\W+/g, "");
@@ -59,11 +63,11 @@ export function Api(api: Doc = {}, options: Doc = {}) {
   property(
     this,
     "operations",
-    new Collection(
+    new _Collection(
       api.operations,
       options,
       function(name: string, operation: Doc): any {
-        return new Operation(name, operation, options);
+        return new _Operation(name, operation, options);
       } /*, stringUtil.lowerFirst*/,
       addEndpointOperation
     )
@@ -72,7 +76,7 @@ export function Api(api: Doc = {}, options: Doc = {}) {
   property(
     this,
     "shapes",
-    new Collection(api.shapes, options, function(
+    new _Collection(api.shapes, options, function(
       name: string,
       shape: Doc
     ): any {

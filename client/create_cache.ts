@@ -20,13 +20,13 @@ export function createCache(conf: ClientConfig): Doc {
       if (typeof conf.credentials === "function") {
         credentials = await conf.credentials();
       } else {
-        credentials = conf.credentials;
+        credentials = conf.credentials!;
       }
 
       this._signingKey = kdf(
         credentials.secretAccessKey,
         dateStamp,
-        conf.region,
+        conf.region!,
         SERVICE
       ) as Uint8Array;
 

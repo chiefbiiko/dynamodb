@@ -3,6 +3,9 @@ import { API } from "../api/mod.ts";
 import { Translator } from "./translator.ts";
 import { Doc } from "../util.ts";
 
+// ts strict food
+const _Translator: any = Translator;
+
 /** Op options. */
 export interface OpOptions {
   wrapNumbers?: boolean; // wrap numbers to a special number value type? [false]
@@ -38,7 +41,7 @@ export async function baseOp(
   let outputShape: any;
 
   if (translateJSON) {
-    translator = new Translator({
+    translator = new _Translator({
       wrapNumbers,
       convertEmptyValues,
       attrValue: ATTR_VALUE
@@ -59,7 +62,7 @@ export async function baseOp(
 
     return {
       [Symbol.asyncIterator](): AsyncIterableIterator<Doc> {
-        return this;
+        return this as AsyncIterableIterator<Doc>;
       },
       async next(): Promise<IteratorResult<Doc>> {
         if (!lastEvaluatedKey) {

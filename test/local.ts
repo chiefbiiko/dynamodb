@@ -2,9 +2,7 @@ import {
   assert,
   assertEquals,
   assertThrowsAsync,
-  test,
-  runIfMain
-} from "https://deno.land/std/testing/mod.ts";
+} from "https://deno.land/std@v0.34.0/testing/asserts.ts";
 
 import { ClientConfig, DynamoDBClient, createClient } from "../mod.ts";
 
@@ -31,7 +29,7 @@ await dyno.createTable({
   ProvisionedThroughput: { ReadCapacityUnits: 10, WriteCapacityUnits: 10 }
 });
 
-test({
+Deno.test({
   name: "schema translation enabled by default",
   async fn(): Promise<void> {
     const id: string = "abc";
@@ -54,7 +52,7 @@ test({
   }
 });
 
-test({
+Deno.test({
   name: "opt-in raw queries",
   async fn(): Promise<void> {
     const id: string = "def";
@@ -81,7 +79,7 @@ test({
   }
 });
 
-test({
+Deno.test({
   name: "batch write items",
   async fn(): Promise<void> {
     const N: number = 25;
@@ -106,7 +104,7 @@ test({
   }
 });
 
-test({
+Deno.test({
   name: "storing a binary value",
   async fn(): Promise<void> {
     const id: string = "ghi";
@@ -129,7 +127,7 @@ test({
   }
 });
 
-test({
+Deno.test({
   name: "deleting an item",
   async fn(): Promise<void> {
     const id: string = "jkl";
@@ -150,7 +148,7 @@ test({
   }
 });
 
-test({
+Deno.test({
   name: "missing table throws a readable error",
   async fn(): Promise<void> {
     assertThrowsAsync(
@@ -163,7 +161,7 @@ test({
   }
 });
 
-test({
+Deno.test({
   name: "ops that receive paged results return an async iterator by default",
   async fn(): Promise<void> {
     const n: number = 25;
@@ -222,7 +220,7 @@ test({
   }
 });
 
-test({
+Deno.test({
   name: "handling pagination manually",
   async fn(): Promise<void> {
     // only fetching 1 page - not async iterating
@@ -237,4 +235,4 @@ test({
   }
 });
 
-runIfMain(import.meta);
+Deno.runTests();

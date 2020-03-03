@@ -139,12 +139,12 @@ const memberTypeToSetType: Doc = {
 /** DynamoDB set type. */
 export class DynamoDBSet {
   readonly wrappername: string = "Set";
-  readonly values: any[];
-  readonly type: string;
+  readonly values: any[] = [];
+  readonly type: string = "";
 
   /** Creates a dynamodb set. */
   constructor(list: any[] = [], options: Doc = {}) {
-    this.values = [].concat(list);
+    Array.prototype.push.apply(this.values, list);
 
     this.type = memberTypeToSetType[typeOf(this.values[0])];
 

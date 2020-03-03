@@ -3,6 +3,7 @@
 import { Doc, memoizedProperty, noop } from "../util.ts";
 
 function memoize(
+  this: any,
   name: string,
   value: any,
   factory: (
@@ -16,6 +17,7 @@ function memoize(
 }
 
 export function Collection(
+  this: any, 
   iterable: any,
   options: Doc,
   factory: (

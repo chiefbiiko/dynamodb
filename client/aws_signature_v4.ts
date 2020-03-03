@@ -10,7 +10,7 @@ export function awsSignatureV4(
   msg: Uint8Array,
   outputEncoding?: string
 ): string | Uint8Array {
-  return hmac("sha256", key, msg, null, outputEncoding);
+  return hmac("sha256", key, msg, undefined, outputEncoding);
 }
 
 /** Creates a key for generating an aws signature version 4. */

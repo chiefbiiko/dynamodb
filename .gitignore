@@ -1,2 +1,2 @@
-dynamodb_local_latest.zip
-dynamodb_local_latest
+dynamodb_local_latest*
+shared-local-instance.db*

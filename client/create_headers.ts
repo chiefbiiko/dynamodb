@@ -38,7 +38,7 @@ export async function createHeaders(
 
   const signedHeaders: string = "content-type;host;x-amz-date;x-amz-target";
 
-  const payloadHash: string = sha256(payload, null, "hex") as string;
+  const payloadHash: string = sha256(payload, undefined, "hex") as string;
 
   const canonicalRequest: string = `${conf.method}\n${canonicalUri}\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
 

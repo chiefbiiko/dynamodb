@@ -60,6 +60,6 @@ export function deriveConfig(conf: ClientConfig = {}): Doc {
     ..._conf,
     cache: createCache(_conf),
     method: "POST",
-    ...deriveHostEndpoint(_conf.region, _conf.port)
+    ...deriveHostEndpoint(_conf.region!, _conf.port!)
   };
 }

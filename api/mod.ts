@@ -1,7 +1,8 @@
-import { Doc } from "../util.ts";
 import { Api } from "./api.ts";
 
-const spec: Doc = JSON.parse(`
+const _Api: any = Api;
+
+export const API: any = new _Api(JSON.parse(`
 {
   "version": "2.0",
   "metadata": {
@@ -2228,6 +2229,4 @@ const spec: Doc = JSON.parse(`
     }
   }
 }  
-`);
-
-export const API: any = new Api(spec);
+`));

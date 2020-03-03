@@ -17,9 +17,9 @@ jobs:
       TABLE_NAME: testing_table
     steps:
       - name: clone repo
-        uses: actions/checkout@v1.0.0
+        uses: actions/checkout@v2.0.0
       - name: install deno
-        uses: denolib/setup-deno@v1.1.0
+        uses: denolib/setup-deno@v1.2.0
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

@@ -3,7 +3,9 @@
 import { Doc } from "../util.ts";
 import { Converter } from "./converter.ts";
 
-export function Translator({
+export function Translator(
+  this: any,
+  {
   wrapNumbers,
   convertEmptyValues,
   attrValue
@@ -32,7 +34,7 @@ Translator.prototype.translate = function(value: any, shape: any): any {
   }
 
   if (shape.shape === self.attrValue) {
-    return Converter[self.mode](value, {
+    return (Converter as any)[self.mode](value, {
       convertEmptyValues: self.convertEmptyValues,
       wrapNumbers: self.wrapNumbers
     });
@@ -53,7 +55,7 @@ Translator.prototype.translate = function(value: any, shape: any): any {
 Translator.prototype.translateStructure = function(
   structure: any,
   shape: any
-): Doc {
+): undefined|Doc {
   const self: any = this;
 
   if (structure == null) {
@@ -77,7 +79,7 @@ Translator.prototype.translateStructure = function(
   return struct;
 };
 
-Translator.prototype.translateList = function(list: any[], shape: any): any[] {
+Translator.prototype.translateList = function(list: any[], shape: any): undefined | any[] {
   const self: any = this;
 
   if (list == null) {
@@ -104,10 +106,10 @@ Translator.prototype.translateList = function(list: any[], shape: any): any[] {
   // return out;
 };
 
-Translator.prototype.translateMap = function(map: Doc, shape: any): Doc {
+Translator.prototype.translateMap = function(map: Doc |undefined|null, shape: any): undefined | Doc {
   const self: any = this;
 
-  if (map == null) {
+  if (!map) {
     return undefined;
   }
 

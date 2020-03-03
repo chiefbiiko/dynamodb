@@ -1,13 +1,9 @@
-import {
-  assertEquals,
-  test,
-  runIfMain
-} from "https://deno.land/std/testing/mod.ts";
+import { assertEquals } from "https://deno.land/std@v0.34.0/testing/asserts.ts";
 
 import { encode } from "../deps.ts";
 import { awsSignatureV4, kdf } from "../client/aws_signature_v4.ts";
 
-test({
+Deno.test({
   name: "aws signature v4 flow",
   fn(): void {
     const expectedSignature: string =
@@ -32,4 +28,4 @@ test({
   }
 });
 
-runIfMain(import.meta);
+Deno.runTests();

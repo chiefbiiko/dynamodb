@@ -6,7 +6,7 @@ import { Shape } from "./shape.ts";
 import { Doc, memoizedProperty, property } from "../util.ts";
 // import { Doc} from "../types.ts"
 
-export function Operation(name: string, operation: Doc, options: Doc = {}) {
+export function Operation(this: any, name: string, operation: Doc, options: Doc = {}) {
   const self: any = this;
   // options = options || {};
 
@@ -47,7 +47,7 @@ export function Operation(name: string, operation: Doc, options: Doc = {}) {
 
   memoizedProperty(this, "errors", function(): any[] {
     if (!operation.errors) {
-      return null;
+      return [];
     }
 
     return operation.errors.map((error: any): any =>
@@ -83,8 +83,8 @@ export function Operation(name: string, operation: Doc, options: Doc = {}) {
     }
 
     return Object.entries(self.input.members)
-      .filter(([_, value]: [string, Doc]): boolean => value.isIdempotent)
-      .map(([key, _]: [string, Doc]): string => key);
+      .filter(([_, value]: [string, any]): boolean => value.isIdempotent)
+      .map(([key, _]: [string, any]): string => key);
 
     // for (const name in members) {
     //   if (!members.hasOwnProperty(name)) {
