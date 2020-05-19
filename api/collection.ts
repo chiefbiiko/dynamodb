@@ -8,23 +8,23 @@ function memoize(
   value: any,
   factory: (
     name: string,
-    value: any
-  ) => any /*, nameTr: (name:string)=> string*/
+    value: any,
+  ) => any, /*, nameTr: (name:string)=> string*/
 ): void {
-  memoizedProperty(this, name /*nameTr(name)*/, function(): any {
+  memoizedProperty(this, name, /*nameTr(name)*/ function (): any {
     return factory(name, value);
   });
 }
 
 export function Collection(
-  this: any, 
+  this: any,
   iterable: any,
   options: Doc,
   factory: (
     name: string,
-    value: any
-  ) => any /*, nameTr: (name:string)=> string = String*/,
-  callback: (name: string, value: any) => any = noop
+    value: any,
+  ) => any, /*, nameTr: (name:string)=> string = String*/
+  callback: (name: string, value: any) => any = noop,
 ) {
   // nameTr = nameTr || String;
   // var self = this;

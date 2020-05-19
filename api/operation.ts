@@ -6,7 +6,12 @@ import { Shape } from "./shape.ts";
 import { Doc, memoizedProperty, property } from "../util.ts";
 // import { Doc} from "../types.ts"
 
-export function Operation(this: any, name: string, operation: Doc, options: Doc = {}) {
+export function Operation(
+  this: any,
+  name: string,
+  operation: Doc,
+  options: Doc = {},
+) {
   const self: any = this;
   // options = options || {};
 
@@ -23,13 +28,11 @@ export function Operation(this: any, name: string, operation: Doc, options: Doc 
     this,
     "endpointDiscoveryRequired",
     operation.endpointdiscovery
-      ? operation.endpointdiscovery.required
-        ? "REQUIRED"
-        : "OPTIONAL"
-      : "NULL"
+      ? operation.endpointdiscovery.required ? "REQUIRED" : "OPTIONAL"
+      : "NULL",
   );
 
-  memoizedProperty(this, "input", function(): any {
+  memoizedProperty(this, "input", function (): any {
     if (!operation.input) {
       return /*new*/ Shape.create({ type: "structure" }, options);
     }
@@ -37,7 +40,7 @@ export function Operation(this: any, name: string, operation: Doc, options: Doc 
     return Shape.create(operation.input, options);
   });
 
-  memoizedProperty(this, "output", function(): any {
+  memoizedProperty(this, "output", function (): any {
     if (!operation.output) {
       return /*new*/ Shape.create({ type: "structure" }, options);
     }
@@ -45,7 +48,7 @@ export function Operation(this: any, name: string, operation: Doc, options: Doc 
     return Shape.create(operation.output, options);
   });
 
-  memoizedProperty(this, "errors", function(): any[] {
+  memoizedProperty(this, "errors", function (): any[] {
     if (!operation.errors) {
       return [];
     }
@@ -63,7 +66,7 @@ export function Operation(this: any, name: string, operation: Doc, options: Doc 
     // return list;
   });
 
-  memoizedProperty(this, "paginator", function(): any {
+  memoizedProperty(this, "paginator", function (): any {
     return options.api.paginators[name];
   });
 
@@ -73,7 +76,7 @@ export function Operation(this: any, name: string, operation: Doc, options: Doc 
   }
 
   // idempotentMembers only tracks top-level input shapes
-  memoizedProperty(this, "idempotentMembers", function(): string[] {
+  memoizedProperty(this, "idempotentMembers", function (): string[] {
     // const idempotentMembers: string[] = [];
     // const input: Doc = self.input;
     // const members: Doc = input.members;
@@ -99,7 +102,7 @@ export function Operation(this: any, name: string, operation: Doc, options: Doc 
     // return idempotentMembers;
   });
 
-  memoizedProperty(this, "hasEventOutput", function(): boolean {
+  memoizedProperty(this, "hasEventOutput", function (): boolean {
     // var output = self.output;
     return hasEventStream(self.output);
   });

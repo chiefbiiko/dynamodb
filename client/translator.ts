@@ -6,27 +6,28 @@ import { Converter } from "./converter.ts";
 export function Translator(
   this: any,
   {
-  wrapNumbers,
-  convertEmptyValues,
-  attrValue
-}: Doc = {}) {
+    wrapNumbers,
+    convertEmptyValues,
+    attrValue,
+  }: Doc = {},
+) {
   // options = options || {};
   this.attrValue = attrValue;
   this.convertEmptyValues = Boolean(convertEmptyValues);
   this.wrapNumbers = Boolean(wrapNumbers);
 }
 
-Translator.prototype.translateInput = function(value: any, shape: any): any {
+Translator.prototype.translateInput = function (value: any, shape: any): any {
   this.mode = "input";
   return this.translate(value, shape);
 };
 
-Translator.prototype.translateOutput = function(value: any, shape: any): any {
+Translator.prototype.translateOutput = function (value: any, shape: any): any {
   this.mode = "output";
   return this.translate(value, shape);
 };
 
-Translator.prototype.translate = function(value: any, shape: any): any {
+Translator.prototype.translate = function (value: any, shape: any): any {
   const self: any = this;
 
   if (!shape || value === undefined) {
@@ -36,7 +37,7 @@ Translator.prototype.translate = function(value: any, shape: any): any {
   if (shape.shape === self.attrValue) {
     return (Converter as any)[self.mode](value, {
       convertEmptyValues: self.convertEmptyValues,
-      wrapNumbers: self.wrapNumbers
+      wrapNumbers: self.wrapNumbers,
     });
   }
 
@@ -52,10 +53,10 @@ Translator.prototype.translate = function(value: any, shape: any): any {
   }
 };
 
-Translator.prototype.translateStructure = function(
+Translator.prototype.translateStructure = function (
   structure: any,
-  shape: any
-): undefined|Doc {
+  shape: any,
+): undefined | Doc {
   const self: any = this;
 
   if (structure == null) {
@@ -79,7 +80,10 @@ Translator.prototype.translateStructure = function(
   return struct;
 };
 
-Translator.prototype.translateList = function(list: any[], shape: any): undefined | any[] {
+Translator.prototype.translateList = function (
+  list: any[],
+  shape: any,
+): undefined | any[] {
   const self: any = this;
 
   if (list == null) {
@@ -106,7 +110,10 @@ Translator.prototype.translateList = function(list: any[], shape: any): undefine
   // return out;
 };
 
-Translator.prototype.translateMap = function(map: Doc |undefined|null, shape: any): undefined | Doc {
+Translator.prototype.translateMap = function (
+  map: Doc | undefined | null,
+  shape: any,
+): undefined | Doc {
   const self: any = this;
 
   if (!map) {
@@ -125,7 +132,7 @@ Translator.prototype.translateMap = function(map: Doc |undefined|null, shape: an
 
       return acc;
     },
-    {}
+    {},
   );
 
   // var out = {};
@@ -138,6 +145,6 @@ Translator.prototype.translateMap = function(map: Doc |undefined|null, shape: an
   // return out;
 };
 
-Translator.prototype.translateScalar = function(value: any, shape: any): any {
+Translator.prototype.translateScalar = function (value: any, shape: any): any {
   return shape.toType(value);
 };

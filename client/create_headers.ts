@@ -22,7 +22,7 @@ export async function createHeaders(
   op: string,
   payload: Uint8Array,
   conf: HeadersConfig,
-  refreshCredentials: boolean = !conf.cache.signingKey
+  refreshCredentials: boolean = !conf.cache.signingKey,
 ): Promise<Headers> {
   if (refreshCredentials) {
     await conf.cache.refresh();
@@ -34,38 +34,41 @@ export async function createHeaders(
 
   const canonicalUri: string = conf.canonicalUri || "/";
 
-  const canonicalHeaders: string = `content-type:${CONTENT_TYPE}\nhost:${conf.host}\nx-amz-date:${amzDate}\nx-amz-target:${amzTarget}\n`;
+  const canonicalHeaders: string =
+    `content-type:${CONTENT_TYPE}\nhost:${conf.host}\nx-amz-date:${amzDate}\nx-amz-target:${amzTarget}\n`;
 
   const signedHeaders: string = "content-type;host;x-amz-date;x-amz-target";
 
   const payloadHash: string = sha256(payload, undefined, "hex") as string;
 
-  const canonicalRequest: string = `${conf.method}\n${canonicalUri}\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
+  const canonicalRequest: string =
+    `${conf.method}\n${canonicalUri}\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
 
   const canonicalRequestDigest: string = sha256(
     canonicalRequest,
     "utf8",
-    "hex"
+    "hex",
   ) as string;
 
   const msg: Uint8Array = encode(
     `${ALGORITHM}\n${amzDate}\n${conf.cache.credentialScope}\n${canonicalRequestDigest}`,
-    "utf8"
+    "utf8",
   );
 
   const signature: string = awsSignatureV4(
     conf.cache.signingKey,
     msg,
-    "hex"
+    "hex",
   ) as string;
 
-  const authorizationHeader: string = `${ALGORITHM} Credential=${conf.cache.accessKeyId}/${conf.cache.credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+  const authorizationHeader: string =
+    `${ALGORITHM} Credential=${conf.cache.accessKeyId}/${conf.cache.credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
   const headers: Headers = new Headers({
     "Content-Type": CONTENT_TYPE,
     "X-Amz-Date": amzDate,
     "X-Amz-Target": amzTarget,
-    Authorization: authorizationHeader
+    Authorization: authorizationHeader,
   });
 
   // https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html

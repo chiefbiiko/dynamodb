@@ -5,10 +5,10 @@ import {
   Doc,
   date,
   memoizedProperty as utilMemoizedProperty,
-  property as utilProperty
+  property as utilProperty,
 } from "../util.ts";
 
-const _Collection: any = Collection
+const _Collection: any = Collection;
 
 function property(
   this: any,
@@ -16,7 +16,7 @@ function property(
   name: string,
   value: any,
   enumerable?: boolean,
-  isValue?: boolean
+  isValue?: boolean,
 ): void {
   if (value !== null && value !== undefined) {
     utilProperty.apply(this, arguments as any);
@@ -28,14 +28,19 @@ function memoizedProperty(
   obj: any,
   name: string,
   get: () => any,
-  enumerable?: boolean
+  enumerable?: boolean,
 ): void {
   if (!obj.constructor.prototype[name]) {
     utilMemoizedProperty.apply(this, arguments as any);
   }
 }
 
-export function Shape(this: any, shape: Doc, options: Doc = {}, memberName: string) {
+export function Shape(
+  this: any,
+  shape: Doc,
+  options: Doc = {},
+  memberName: string,
+) {
   property(this, "shape", shape.shape);
   property(this, "api", options.api, false);
   property(this, "type", shape.type);
@@ -51,7 +56,7 @@ export function Shape(this: any, shape: Doc, options: Doc = {}, memberName: stri
       shape.xmlName ||
       shape.queryName ||
       shape.locationName ||
-      memberName
+      memberName,
   );
   property(this, "isStreaming", shape.streaming || this.isStreaming || false);
   property(this, "requiresLength", shape.requiresLength, false);
@@ -64,7 +69,7 @@ export function Shape(this: any, shape: Doc, options: Doc = {}, memberName: stri
   property(
     this,
     "isSensitive",
-    shape.sensitive || (shape.prototype && shape.prototype.sensitive)
+    shape.sensitive || (shape.prototype && shape.prototype.sensitive),
   );
   property(this, "isEventStream", Boolean(shape.eventstream), false);
   property(this, "isEvent", Boolean(shape.event), false);
@@ -75,13 +80,13 @@ export function Shape(this: any, shape: Doc, options: Doc = {}, memberName: stri
     "isTimestampFormatSet",
     Boolean(shape.timestampFormat) ||
       (shape.prototype && shape.prototype.isTimestampFormatSet),
-    false
+    false,
   );
   property(
     this,
     "endpointDiscoveryId",
     Boolean(shape.endpointdiscoveryid),
-    false
+    false,
   );
   property(this, "hostLabel", Boolean(shape.hostLabel), false);
 
@@ -97,7 +102,7 @@ export function Shape(this: any, shape: Doc, options: Doc = {}, memberName: stri
   // type conversion and parsing
   property(this, "defaultValue", null);
 
-  this.toWireFormat = function(value: any): any {
+  this.toWireFormat = function (value: any): any {
     if (value === null || value === undefined) {
       return "";
     }
@@ -105,7 +110,7 @@ export function Shape(this: any, shape: Doc, options: Doc = {}, memberName: stri
     return value;
   };
 
-  this.toType = function(value: any): any {
+  this.toType = function (value: any): any {
     return value;
   };
 }
@@ -120,7 +125,7 @@ Shape.normalizedTypes = {
   short: "integer",
   biginteger: "integer",
   bigdecimal: "float",
-  blob: "binary"
+  blob: "binary",
 };
 
 /**
@@ -136,10 +141,10 @@ Shape.types = {
   integer: IntegerShape,
   string: StringShape,
   base64: Base64Shape,
-  binary: BinaryShape
+  binary: BinaryShape,
 };
 
-Shape.resolve = function resolve(shape: Doc, options: Doc = {}): Doc |null {
+Shape.resolve = function resolve(shape: Doc, options: Doc = {}): Doc | null {
   if (shape.shape) {
     const refShape: Doc = options.api.shapes[shape.shape];
 
@@ -156,7 +161,7 @@ Shape.resolve = function resolve(shape: Doc, options: Doc = {}): Doc |null {
 Shape.create = function create(
   shape: Doc,
   options: Doc = {},
-  memberName: string = ""
+  memberName: string = "",
 ): any {
   if (shape.isShape) {
     return shape;
@@ -168,13 +173,13 @@ Shape.create = function create(
     let filteredKeys: string[] = Object.keys(shape);
 
     if (!options.documentation) {
-      filteredKeys = filteredKeys.filter(function(name: string): boolean {
+      filteredKeys = filteredKeys.filter(function (name: string): boolean {
         return !name.match(/documentation/);
       });
     }
 
     // create an inline shape with extra members
-    const InlineShape: any = function(this: any): void {
+    const InlineShape: any = function (this: any): void {
       refShape.constructor.call(this, shape, options, memberName);
     };
 
@@ -226,13 +231,13 @@ function StructureShape(this: any, shape: Doc, options: Doc = {}) {
   CompositeShape.apply(this, arguments as any);
 
   if (firstInit) {
-    property(this, "defaultValue", function() {
+    property(this, "defaultValue", function () {
       return {};
     });
     property(this, "members", {});
     property(this, "memberNames", []);
     property(this, "required", []);
-    property(this, "isRequired", function() {
+    property(this, "isRequired", function () {
       return false;
     });
   }
@@ -241,20 +246,20 @@ function StructureShape(this: any, shape: Doc, options: Doc = {}) {
     property(
       this,
       "members",
-      new _Collection(shape.members, options, function(
+      new _Collection(shape.members, options, function (
         name: string,
-        member: Doc
+        member: Doc,
       ): any {
         return Shape.create(member, options, name);
-      })
+      }),
     );
 
-    memoizedProperty(this, "memberNames", function(): string[] {
+    memoizedProperty(this, "memberNames", function (): string[] {
       return shape.xmlOrder || Object.keys(shape.members);
     });
 
     if (shape.event) {
-      memoizedProperty(this, "eventPayloadMemberName", function(): string {
+      memoizedProperty(this, "eventPayloadMemberName", function (): string {
         const members: Doc = self.members;
         const memberNames: string[] = self.memberNames;
 
@@ -264,11 +269,11 @@ function StructureShape(this: any, shape: Doc, options: Doc = {}) {
             return memberNames[i];
           }
         }
-        
+
         return "";
       });
 
-      memoizedProperty(this, "eventHeaderMemberNames", function(): string[] {
+      memoizedProperty(this, "eventHeaderMemberNames", function (): string[] {
         const members: Doc = self.members;
         const memberNames: string[] = self.memberNames;
         const eventHeaderMemberNames: string[] = [];
@@ -287,16 +292,16 @@ function StructureShape(this: any, shape: Doc, options: Doc = {}) {
 
   if (shape.required) {
     property(this, "required", shape.required);
-    
+
     const requiredMap = shape.required.reduce((acc: Doc, req: string): Doc => {
       acc[req] = true;
       return acc;
-    }, {})
+    }, {});
 
     property(
       this,
       "isRequired",
-      function(name: string): boolean {
+      function (name: string): boolean {
         // if (!requiredMap) {
         //   // requiredMap = {};
         //   //
@@ -312,7 +317,7 @@ function StructureShape(this: any, shape: Doc, options: Doc = {}) {
         return requiredMap[name];
       },
       false,
-      true
+      true,
     );
   }
 
@@ -337,13 +342,13 @@ function ListShape(this: any, shape: Doc, options: Doc = {}) {
   CompositeShape.apply(this, arguments as any);
 
   if (firstInit) {
-    property(this, "defaultValue", function(): any[] {
+    property(this, "defaultValue", function (): any[] {
       return [];
     });
   }
 
   if (shape.member) {
-    memoizedProperty(this, "member", function(): any {
+    memoizedProperty(this, "member", function (): any {
       return Shape.create(shape.member, options);
     });
   }
@@ -351,19 +356,19 @@ function ListShape(this: any, shape: Doc, options: Doc = {}) {
   if (this.flattened) {
     const oldName: string = this.name;
 
-    memoizedProperty(this, "name", function(): string {
+    memoizedProperty(this, "name", function (): string {
       return self.member.name || oldName;
     });
   }
 }
 
-function MapShape(this: any,shape: Doc, options: Doc = {}) {
+function MapShape(this: any, shape: Doc, options: Doc = {}) {
   const firstInit: boolean = !this.isShape;
 
   CompositeShape.apply(this, arguments as any);
 
   if (firstInit) {
-    property(this, "defaultValue", function(): Doc {
+    property(this, "defaultValue", function (): Doc {
       return {};
     });
     property(this, "key", Shape.create({ type: "string" }, options));
@@ -371,13 +376,13 @@ function MapShape(this: any,shape: Doc, options: Doc = {}) {
   }
 
   if (shape.key) {
-    memoizedProperty(this, "key", function(): any {
+    memoizedProperty(this, "key", function (): any {
       return Shape.create(shape.key, options);
     });
   }
 
   if (shape.value) {
-    memoizedProperty(this, "value", function(): any {
+    memoizedProperty(this, "value", function (): any {
       return Shape.create(shape.value, options);
     });
   }
@@ -410,7 +415,7 @@ function TimestampShape(this: any, shape: Doc) {
     }
   }
 
-  this.toType = function(value: any): undefined |Date {
+  this.toType = function (value: any): undefined | Date {
     if (value === null || value === undefined) {
       return undefined;
     }
@@ -419,17 +424,17 @@ function TimestampShape(this: any, shape: Doc) {
       return value as Date;
     }
 
-    if ( typeof value === "string" || typeof value === "number") {
-      return date.parseTimestamp(value)
+    if (typeof value === "string" || typeof value === "number") {
+      return date.parseTimestamp(value);
     }
 
-    return undefined
+    return undefined;
     // return typeof value === "string" || typeof value === "number"
     //   ? date.parseTimestamp(value)
     //   : null;
   };
 
-  this.toWireFormat = function(value: any): string {
+  this.toWireFormat = function (value: any): string {
     return date.format(value, self.timestampFormat);
   };
 }
@@ -439,11 +444,10 @@ function StringShape(this: any) {
 
   const nullLessProtocols: string[] = ["rest-xml", "query", "ec2"];
 
-  this.toType = function(value: any): any {
-    value =
-      this.api && nullLessProtocols.indexOf(this.api.protocol) > -1
-        ? value || ""
-        : value;
+  this.toType = function (value: any): any {
+    value = this.api && nullLessProtocols.indexOf(this.api.protocol) > -1
+      ? value || ""
+      : value;
 
     if (this.isJsonValue) {
       return JSON.parse(value);
@@ -454,7 +458,7 @@ function StringShape(this: any) {
       : value;
   };
 
-  this.toWireFormat = function(value: any): any {
+  this.toWireFormat = function (value: any): any {
     return this.isJsonValue ? JSON.stringify(value) : value;
   };
 }
@@ -462,7 +466,7 @@ function StringShape(this: any) {
 function FloatShape(this: any) {
   Shape.apply(this, arguments as any);
 
-  this.toType = function(value: any): undefined|number {
+  this.toType = function (value: any): undefined | number {
     if (value === null || value === undefined) {
       return undefined;
     }
@@ -473,10 +477,10 @@ function FloatShape(this: any) {
   this.toWireFormat = this.toType;
 }
 
-function IntegerShape(this:any) {
+function IntegerShape(this: any) {
   Shape.apply(this, arguments as any);
 
-  this.toType = function(value: any): undefined|number {
+  this.toType = function (value: any): undefined | number {
     if (value === null || value === undefined) {
       return undefined;
     }
@@ -487,7 +491,7 @@ function IntegerShape(this:any) {
   this.toWireFormat = this.toType;
 }
 
-function BinaryShape(this:any) {
+function BinaryShape(this: any) {
   Shape.apply(this, arguments as any);
 
   this.toType = base64ToUint8Array;
@@ -502,7 +506,7 @@ function Base64Shape(this: any) {
 function BooleanShape(this: any) {
   Shape.apply(this, arguments as any);
 
-  this.toType = function(value: any): undefined|boolean {
+  this.toType = function (value: any): undefined | boolean {
     if (typeof value === "boolean") {
       return value;
     }
@@ -524,7 +528,7 @@ Shape.shapes = {
   MapShape: MapShape,
   StringShape: StringShape,
   BooleanShape: BooleanShape,
-  Base64Shape: Base64Shape
+  Base64Shape: Base64Shape,
 };
 
 // /**

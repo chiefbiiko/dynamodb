@@ -8,7 +8,7 @@ const AWS4: Uint8Array = encode("AWS4", "utf8");
 export function awsSignatureV4(
   key: Uint8Array,
   msg: Uint8Array,
-  outputEncoding?: string
+  outputEncoding?: string,
 ): string | Uint8Array {
   return hmac("sha256", key, msg, undefined, outputEncoding);
 }
@@ -20,7 +20,7 @@ export function kdf(
   region: string,
   service: string,
   keyInputEncoding?: string,
-  outputEncoding?: string
+  outputEncoding?: string,
 ): string | Uint8Array {
   if (typeof key === "string") {
     key = encode(key, keyInputEncoding) as Uint8Array;
@@ -41,7 +41,7 @@ export function kdf(
     "sha256",
     paddedKey,
     dateStamp as string,
-    "utf8"
+    "utf8",
   ) as Uint8Array;
 
   mac = hmac("sha256", mac, region, "utf8") as Uint8Array;

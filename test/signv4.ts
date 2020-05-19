@@ -14,18 +14,16 @@ Deno.test({
       "20310430",
       "region",
       "dynamodb",
-      "utf8"
+      "utf8",
     ) as Uint8Array;
 
     const msg: Uint8Array = encode(
       "AWS4-HMAC-SHA256\n20310430T201613Z\n20310430/region/dynamodb/aws4_request\n4be20e7bf75dc6c7e93873b5f49096771729b8a28f0c62010db431fea79220ef",
-      "utf8"
+      "utf8",
     );
 
     const actualSignature: string = awsSignatureV4(key, msg, "hex") as string;
 
     assertEquals(actualSignature, expectedSignature);
-  }
+  },
 });
-
-Deno.runTests();

@@ -121,23 +121,23 @@ const { contents, ops }: Doc = Array.from(OPS)
 
       const camel: string = `${op[0].toLowerCase()}${op.slice(1)}`;
 
-      const signature: string = `${camel}(${params}options?: OpOptions): ${rtn}`;
+      const signature: string =
+        `${camel}(${params}options?: OpOptions): ${rtn}`;
 
       const tail: string = i === OPS.size - 1 ? "" : "\n\n";
 
       return {
         contentItem: `    + [${op}](#${op})${tail}`,
-        opItem:
-          `#### ${op}\n\n##### \`${signature}\`\n\n` +
-          `[aws ${op} docs](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_${op}.html)${tail}`
+        opItem: `#### ${op}\n\n##### \`${signature}\`\n\n` +
+          `[aws ${op} docs](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_${op}.html)${tail}`,
       };
-    }
+    },
   )
   .reduce(
     (
       acc: { contents: string[]; ops: string[] },
       { contentItem, opItem }: Doc,
-      i: number
+      i: number,
     ): Doc => {
       acc.contents[3 + i] = contentItem;
       acc.ops[i] = opItem;
@@ -148,15 +148,15 @@ const { contents, ops }: Doc = Array.from(OPS)
       contents: [
         "1. [Basics](#Basics)\n\n",
         "2. [Factory](#Factory)\n\n",
-        "3. [Ops](#Ops)\n\n"
+        "3. [Ops](#Ops)\n\n",
       ].concat(new Array(OPS.size)),
-      ops: new Array(OPS.size)
-    }
+      ops: new Array(OPS.size),
+    },
   );
 
 const readTheDocs: string = README0.replace(
   "<CONTENTS/>",
-  contents.join("")
+  contents.join(""),
 ).replace("<OPS/>", ops.join(""));
 
 Deno.writeFileSync("./README.md", new TextEncoder().encode(readTheDocs));

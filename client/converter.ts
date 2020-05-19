@@ -55,7 +55,7 @@ function formatSet(data: Doc, options: Doc = {}): Doc {
       map["BS"] = values;
       break;
     case "Number":
-      map["NS"] = values.map(function(value) {
+      map["NS"] = values.map(function (value) {
         return value.toString();
       });
   }
@@ -70,7 +70,7 @@ function filterEmptySetValues(set: Doc): any[] {
   const potentiallyEmptyTypes: Doc = {
     String: true,
     Binary: true,
-    Number: false
+    Number: false,
   };
 
   if (potentiallyEmptyTypes[set.type]) {
@@ -139,8 +139,8 @@ export class Converter {
       // this value has a custom constructor
       return formatMap(data, options);
     }
-    
-    return {}
+
+    return {};
   }
 
   /**
@@ -236,7 +236,7 @@ export class Converter {
         return new DynamoDBSet(
           values.map((value: any): number =>
             convertNumber(value, options.wrapNumbers)
-          )
+          ),
         );
       } else if (type === "BS") {
         // list = [];

@@ -11,11 +11,11 @@ export interface DynamoDBClient {
   listTables: (options?: Doc) => Promise<Doc>;
   scan: (
     params: Doc,
-    options?: Doc
+    options?: Doc,
   ) => Promise<Doc | AsyncIterableIterator<Doc>>;
   query: (
     params: Doc,
-    options?: Doc
+    options?: Doc,
   ) => Promise<Doc | AsyncIterableIterator<Doc>>;
   [key: string]: (params: Doc, options?: Doc) => Promise<Doc>;
 }
@@ -73,7 +73,7 @@ export const OPS: Set<string> = new Set<string>([
   "UpdateGlobalTableSettings",
   "UpdateItem",
   "UpdateTable",
-  "UpdateTimeToLive"
+  "UpdateTimeToLive",
 ]);
 
 /** Creates a DynamoDB client. */

@@ -27,10 +27,11 @@ export function createCache(conf: ClientConfig): Doc {
         credentials.secretAccessKey,
         dateStamp,
         conf.region!,
-        SERVICE
+        SERVICE,
       ) as Uint8Array;
 
-      this._credentialScope = `${dateStamp}/${conf.region}/${SERVICE}/aws4_request`;
+      this._credentialScope =
+        `${dateStamp}/${conf.region}/${SERVICE}/aws4_request`;
       this._accessKeyId = credentials.accessKeyId;
       this._sessionToken = credentials.sessionToken;
     },
@@ -45,6 +46,6 @@ export function createCache(conf: ClientConfig): Doc {
     },
     get sessionToken(): string {
       return this._sessionToken;
-    }
+    },
   };
 }

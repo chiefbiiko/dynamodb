@@ -7,7 +7,7 @@ import {
   ClientConfig,
   Credentials,
   DynamoDBClient,
-  createClient
+  createClient,
 } from "../mod.ts";
 
 import { Doc } from "../util.ts";
@@ -16,7 +16,7 @@ import { Doc } from "../util.ts";
  * This test suite requires an existing DynamoDB table as well as the
  * corresponding IAM access permissions. Pass a TABLE_NAME env var.
  */
-const TABLE_NAME: string = Deno.env().TABLE_NAME;
+const TABLE_NAME: string = Deno.env.get("TABLE_NAME");
 
 const dyno: DynamoDBClient = createClient();
 
@@ -31,16 +31,16 @@ Deno.test({
 
     result = await dyno.putItem({
       TableName: TABLE_NAME,
-      Item: { id, friends }
+      Item: { id, friends },
     });
 
     result = await dyno.getItem({
       TableName: TABLE_NAME,
-      Key: { id }
+      Key: { id },
     });
 
     assertEquals(result.Item.friends, friends);
-  }
+  },
 });
 
 Deno.test({
@@ -51,9 +51,9 @@ Deno.test({
     let result: Doc = await dyno.putItem(
       {
         TableName: TABLE_NAME,
-        Item: { id: { S: id }, role: { S: "admin" } }
+        Item: { id: { S: id }, role: { S: "admin" } },
       },
-      { translateJSON: false }
+      { translateJSON: false },
     );
 
     assertEquals(result, {});
@@ -61,13 +61,13 @@ Deno.test({
     result = await dyno.getItem(
       {
         TableName: TABLE_NAME,
-        Key: { id: { S: id } }
+        Key: { id: { S: id } },
       },
-      { translateJSON: false }
+      { translateJSON: false },
     );
 
     assertEquals(result.Item.role.S, "admin");
-  }
+  },
 });
 
 Deno.test({
@@ -76,23 +76,23 @@ Deno.test({
     const N: number = 25;
 
     const params: Doc = {
-      RequestItems: { [TABLE_NAME]: new Array(N) }
+      RequestItems: { [TABLE_NAME]: new Array(N) },
     };
 
     for (let i: number = 0; i < N; ++i) {
       params.RequestItems[TABLE_NAME][i] = {
         PutRequest: {
           Item: {
-            id: String(i)
-          }
-        }
+            id: String(i),
+          },
+        },
       };
     }
 
     const result: Doc = await dyno.batchWriteItem(params);
 
     assertEquals(Object.keys(result.UnprocessedItems).length, 0);
-  }
+  },
 });
 
 Deno.test({
@@ -104,18 +104,18 @@ Deno.test({
 
     let result: Doc = await dyno.putItem({
       TableName: TABLE_NAME,
-      Item: { id, buf }
+      Item: { id, buf },
     });
 
     assertEquals(result, {});
 
     result = await dyno.getItem({
       TableName: TABLE_NAME,
-      Key: { id }
+      Key: { id },
     });
 
     assertEquals(result.Item.buf, buf);
-  }
+  },
 });
 
 Deno.test({
@@ -125,49 +125,47 @@ Deno.test({
 
     let result: Doc = await dyno.putItem({
       TableName: TABLE_NAME,
-      Item: { id, fraud: "money" }
+      Item: { id, fraud: "money" },
     });
 
     assertEquals(result, {});
 
     result = await dyno.deleteItem({
       TableName: TABLE_NAME,
-      Key: { id }
+      Key: { id },
     });
 
     assertEquals(result, {});
-  }
+  },
 });
 
 Deno.test({
   name: "missing table throws a readable error",
   async fn(): Promise<void> {
-    assertThrowsAsync(async (): Promise<void> => {
+    await assertThrowsAsync(async (): Promise<void> => {
       await dyno.scan({ TableName: "notatable" });
     }, Error);
-  }
+  },
 });
 
-Deno.test({
-  name: "TODO: having temporary credentials refreshed",
-  async fn(): Promise<void> {
-    // 2 have temp credentials refreshed pass a (n async) credentials func
-    // this will refresh creds after recv a 403 by retrying once
-    const conf: ClientConfig = {
-      async credentials(): Promise<Credentials> {
-        // call STS AssumeRole GetSessionToken or similar...
-        return {
-          accessKeyId: "freshAccessKeyId",
-          secretAccessKey: "freshAccessKey",
-          sessionToken: "freshSessionToken"
-        };
-      }
-    };
-
-    const dyno: DynamoDBClient = createClient();
-
-    await dyno.listTables();
-  }
-});
-
-Deno.runTests({ skip: /TODO/ });
+// Deno.test({
+//   name: "TODO: having temporary credentials refreshed",
+//   async fn(): Promise<void> {
+//     // 2 have temp credentials refreshed pass a (n async) credentials func
+//     // this will refresh creds after recv a 403 by retrying once
+//     const conf: ClientConfig = {
+//       async credentials(): Promise<Credentials> {
+//         // call STS AssumeRole GetSessionToken or similar...
+//         return {
+//           accessKeyId: "freshAccessKeyId",
+//           secretAccessKey: "freshAccessKey",
+//           sessionToken: "freshSessionToken"
+//         };
+//       }
+//     };
+//
+//     const dyno: DynamoDBClient = createClient();
+//
+//     await dyno.listTables();
+//   }
+// });

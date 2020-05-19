@@ -17,9 +17,9 @@ jobs:
       TABLE_NAME: testing_table
     steps:
       - name: clone repo
-        uses: actions/checkout@v2.0.0
+        uses: actions/checkout@v2.1.0
       - name: install deno
-        uses: denolib/setup-deno@v1.2.0
+        uses: denolib/setup-deno@master
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -27,4 +27,4 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
       - name: run tests
-        run: deno run --allow-env --allow-read=$HOME/.aws --allow-net ./test/cloud.ts
+        run: deno test --allow-env --allow-read=$HOME/.aws --allow-net ./test/cloud.ts
