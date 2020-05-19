@@ -4,12 +4,12 @@ import { Shape } from "./shape.ts";
 import {
   Doc,
   memoizedProperty,
-  property /*, string as stringUtil*/
+  property, /*, string as stringUtil*/
 } from "../util.ts";
 
 // NOTE: 2 run in ts strict-mode (bypassing TS7009)
-const _Collection: any = Collection
-const _Operation: any = Operation
+const _Collection: any = Collection;
+const _Operation: any = Operation;
 
 // var Paginator = require('./paginator');
 // var ResourceWaiter = require('./resource_waiter');
@@ -37,9 +37,9 @@ export function Api(this: any, api: Doc = {}, options: Doc = {}) {
   property(this, "fullName", api.metadata.serviceFullName);
   property(this, "serviceId", api.metadata.serviceId);
 
-  memoizedProperty(this, "className", function(): string {
-    let name: string =
-      api.metadata.serviceAbbreviation || api.metadata.serviceFullName;
+  memoizedProperty(this, "className", function (): string {
+    let name: string = api.metadata.serviceAbbreviation ||
+      api.metadata.serviceFullName;
 
     if (!name) {
       return "";
@@ -66,22 +66,22 @@ export function Api(this: any, api: Doc = {}, options: Doc = {}) {
     new _Collection(
       api.operations,
       options,
-      function(name: string, operation: Doc): any {
+      function (name: string, operation: Doc): any {
         return new _Operation(name, operation, options);
-      } /*, stringUtil.lowerFirst*/,
-      addEndpointOperation
-    )
+      }, /*, stringUtil.lowerFirst*/
+      addEndpointOperation,
+    ),
   );
 
   property(
     this,
     "shapes",
-    new _Collection(api.shapes, options, function(
+    new _Collection(api.shapes, options, function (
       name: string,
-      shape: Doc
+      shape: Doc,
     ): any {
       return Shape.create(shape, options);
-    })
+    }),
   );
 
   // property(this, 'paginators', new Collection(api.paginators, options, function(name, paginator) {

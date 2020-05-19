@@ -18,7 +18,7 @@ export interface OpOptions {
 export const NO_PARAMS_OPS: Set<string> = new Set<string>([
   "DescribeEndpoints",
   "DescribeLimits",
-  "ListTables"
+  "ListTables",
 ]);
 
 /** Base shape of all DynamoDB query schemas. */
@@ -34,8 +34,8 @@ export async function baseOp(
     wrapNumbers = false,
     convertEmptyValues = false,
     translateJSON = true,
-    iteratePages = true
-  }: OpOptions = NO_PARAMS_OPS.has(op) ? params || {} : {}
+    iteratePages = true,
+  }: OpOptions = NO_PARAMS_OPS.has(op) ? params || {} : {},
 ): Promise<Doc> {
   let translator: any;
   let outputShape: any;
@@ -44,7 +44,7 @@ export async function baseOp(
     translator = new _Translator({
       wrapNumbers,
       convertEmptyValues,
-      attrValue: ATTR_VALUE
+      attrValue: ATTR_VALUE,
     });
 
     outputShape = API.operations[op].output;
@@ -77,12 +77,12 @@ export async function baseOp(
           if (!translateJSON) {
             return {
               value: rawResult,
-              done: false
+              done: false,
             };
           } else {
             return {
               value: translator.translateOutput(rawResult, outputShape),
-              done: false
+              done: false,
             };
           }
         } else {
@@ -99,9 +99,9 @@ export async function baseOp(
 
         return {
           value: translator.translateOutput(rawResult, outputShape),
-          done: false
+          done: false,
         };
-      }
+      },
     };
   }
 

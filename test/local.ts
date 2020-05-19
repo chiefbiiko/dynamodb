@@ -14,10 +14,10 @@ const conf: ClientConfig = {
   credentials: {
     accessKeyId: "DynamoDBLocal",
     secretAccessKey: "DoesNotDoAnyAuth",
-    sessionToken: "preferTemporaryCredentials"
+    sessionToken: "preferTemporaryCredentials",
   },
   region: "local",
-  port: 8000 // DynamoDB Local's default port
+  port: 8000, // DynamoDB Local's default port
 };
 
 const dyno: DynamoDBClient = createClient(conf);
@@ -26,7 +26,7 @@ await dyno.createTable({
   TableName: TABLE_NAME,
   KeySchema: [{ KeyType: "HASH", AttributeName: "id" }],
   AttributeDefinitions: [{ AttributeName: "id", AttributeType: "S" }],
-  ProvisionedThroughput: { ReadCapacityUnits: 10, WriteCapacityUnits: 10 }
+  ProvisionedThroughput: { ReadCapacityUnits: 10, WriteCapacityUnits: 10 },
 });
 
 Deno.test({
@@ -40,16 +40,16 @@ Deno.test({
 
     result = await dyno.putItem({
       TableName: TABLE_NAME,
-      Item: { id, friends }
+      Item: { id, friends },
     });
 
     result = await dyno.getItem({
       TableName: TABLE_NAME,
-      Key: { id }
+      Key: { id },
     });
 
     assertEquals(result.Item.friends, friends);
-  }
+  },
 });
 
 Deno.test({
@@ -60,9 +60,9 @@ Deno.test({
     let result: Doc = await dyno.putItem(
       {
         TableName: TABLE_NAME,
-        Item: { id: { S: id }, role: { S: "admin" } }
+        Item: { id: { S: id }, role: { S: "admin" } },
       },
-      { translateJSON: false }
+      { translateJSON: false },
     );
 
     assertEquals(result, {});
@@ -70,13 +70,13 @@ Deno.test({
     result = await dyno.getItem(
       {
         TableName: TABLE_NAME,
-        Key: { id: { S: id } }
+        Key: { id: { S: id } },
       },
-      { translateJSON: false }
+      { translateJSON: false },
     );
 
     assertEquals(result.Item.role.S, "admin");
-  }
+  },
 });
 
 Deno.test({
@@ -85,23 +85,23 @@ Deno.test({
     const N: number = 25;
 
     const params: Doc = {
-      RequestItems: { [TABLE_NAME]: new Array(N) }
+      RequestItems: { [TABLE_NAME]: new Array(N) },
     };
 
     for (let i: number = 0; i < N; ++i) {
       params.RequestItems[TABLE_NAME][i] = {
         PutRequest: {
           Item: {
-            id: String(i)
-          }
-        }
+            id: String(i),
+          },
+        },
       };
     }
 
     const result: Doc = await dyno.batchWriteItem(params);
 
     assertEquals(Object.keys(result.UnprocessedItems).length, 0);
-  }
+  },
 });
 
 Deno.test({
@@ -113,18 +113,18 @@ Deno.test({
 
     let result: Doc = await dyno.putItem({
       TableName: TABLE_NAME,
-      Item: { id, buf }
+      Item: { id, buf },
     });
 
     assertEquals(result, {});
 
     result = await dyno.getItem({
       TableName: TABLE_NAME,
-      Key: { id }
+      Key: { id },
     });
 
     assertEquals(result.Item.buf, buf);
-  }
+  },
 });
 
 Deno.test({
@@ -134,31 +134,31 @@ Deno.test({
 
     let result: Doc = await dyno.putItem({
       TableName: TABLE_NAME,
-      Item: { id, fraud: "money" }
+      Item: { id, fraud: "money" },
     });
 
     assertEquals(result, {});
 
     result = await dyno.deleteItem({
       TableName: TABLE_NAME,
-      Key: { id }
+      Key: { id },
     });
 
     assertEquals(result, {});
-  }
+  },
 });
 
 Deno.test({
   name: "missing table throws a readable error",
   async fn(): Promise<void> {
-    assertThrowsAsync(
+    await assertThrowsAsync(
       async (): Promise<void> => {
         await dyno.scan({ TableName: "notatable" });
       },
       Error,
-      "Cannot do operations on a non-existent table"
+      "Cannot do operations on a non-existent table",
     );
-  }
+  },
 });
 
 Deno.test({
@@ -171,7 +171,7 @@ Deno.test({
       const trash: Uint8Array = new Uint8Array(4096);
 
       const params: Doc = {
-        RequestItems: { [TABLE_NAME]: new Array(n) }
+        RequestItems: { [TABLE_NAME]: new Array(n) },
       };
 
       for (let j: number = 0; j < n; ++j) {
@@ -179,9 +179,9 @@ Deno.test({
           PutRequest: {
             Item: {
               id: `batch${i} item${j}`,
-              trash
-            }
-          }
+              trash,
+            },
+          },
         };
       }
 
@@ -196,7 +196,7 @@ Deno.test({
     const unprocessed: number = results.reduce(
       (acc: number, result: Doc): number =>
         acc + Object.keys(result.UnprocessedItems).length,
-      0
+      0,
     );
 
     assertEquals(unprocessed, 0);
@@ -217,7 +217,7 @@ Deno.test({
     assert(pages >= 2);
 
     assert(items > N);
-  }
+  },
 });
 
 Deno.test({
@@ -226,13 +226,11 @@ Deno.test({
     // only fetching 1 page - not async iterating
     const result: Doc = await dyno.scan(
       { TableName: TABLE_NAME },
-      { iteratePages: false }
+      { iteratePages: false },
     );
 
     assert(Array.isArray(result.Items));
     assert(result.Items.length > 0);
     assert(!!result.LastEvaluatedKey);
-  }
+  },
 });
-
-Deno.runTests();

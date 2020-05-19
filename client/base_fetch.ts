@@ -6,20 +6,20 @@ import { Doc } from "../util.ts";
 export async function baseFetch(
   conf: Doc,
   op: string,
-  params: Doc
+  params: Doc,
 ): Promise<Doc> {
   const payload: Uint8Array = encode(JSON.stringify(params), "utf8");
 
   let headers: Headers = await createHeaders(
     op,
     payload,
-    conf as HeadersConfig
+    conf as HeadersConfig,
   );
 
   let response: Response = await fetch(conf.endpoint, {
     method: conf.method,
     headers,
-    body: payload
+    body: payload,
   });
 
   let body: Doc = await response.json();
@@ -32,7 +32,7 @@ export async function baseFetch(
       response = await fetch(conf.endpoint, {
         method: conf.method,
         headers,
-        body: payload
+        body: payload,
       });
 
       if (response.ok) {

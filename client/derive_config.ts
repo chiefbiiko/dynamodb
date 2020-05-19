@@ -6,7 +6,7 @@ import { createCache } from "./create_cache.ts";
 /** Derives host and endpoint. */
 function deriveHostEndpoint(
   region: string,
-  port: number
+  port: number,
 ): { host: string; endpoint: string } {
   let host: string;
   let endpoint: string;
@@ -40,7 +40,7 @@ export function deriveConfig(conf: ClientConfig = {}): Doc {
         accessKeyId: got.accessKeyId,
         secretAccessKey: got.secretAccessKey,
         sessionToken: got.sessionToken,
-        ..._conf.credentials
+        ..._conf.credentials,
       };
     }
 
@@ -60,6 +60,6 @@ export function deriveConfig(conf: ClientConfig = {}): Doc {
     ..._conf,
     cache: createCache(_conf),
     method: "POST",
-    ...deriveHostEndpoint(_conf.region!, _conf.port!)
+    ...deriveHostEndpoint(_conf.region!, _conf.port!),
   };
 }

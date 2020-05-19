@@ -20,11 +20,11 @@ export function property(
   name: string,
   value: any,
   enumerable?: boolean,
-  isValue?: boolean
+  isValue?: boolean,
 ): void {
   const opts: Doc = {
     configurable: true,
-    enumerable: typeof enumerable === "boolean" ? enumerable : true
+    enumerable: typeof enumerable === "boolean" ? enumerable : true,
   };
 
   if (typeof value === "function" && !isValue) {
@@ -42,7 +42,7 @@ export function memoizedProperty(
   obj: any,
   name: string,
   get: () => any,
-  enumerable?: boolean
+  enumerable?: boolean,
 ): void {
   let cachedValue: any = null;
 
@@ -57,7 +57,7 @@ export function memoizedProperty(
 
       return cachedValue;
     },
-    enumerable
+    enumerable,
   );
 }
 
@@ -94,7 +94,7 @@ function isBinary(data: any): boolean {
     "Int32Array",
     "Uint32Array",
     "Float32Array",
-    "Float64Array"
+    "Float64Array",
   ];
 
   // if (util.isNode()) {
@@ -121,7 +121,7 @@ function isBinary(data: any): boolean {
     //
     // }
     return types.some(
-      (type: string): boolean => data.constructor.name === type
+      (type: string): boolean => data.constructor.name === type,
     );
   }
 
@@ -133,7 +133,7 @@ const memberTypeToSetType: Doc = {
   String: "String",
   Number: "Number",
   NumberValue: "Number",
-  Binary: "Binary"
+  Binary: "Binary",
 };
 
 /** DynamoDB set type. */
@@ -150,7 +150,7 @@ export class DynamoDBSet {
 
     if (!this.type) {
       throw new Error(
-        "DynamoDB sets can only contain string, number, or binary values"
+        "DynamoDB sets can only contain string, number, or binary values",
       );
     }
 
@@ -207,10 +207,12 @@ export const date: Doc = {
   /** Date stamp format as expected by awsSignatureV4KDF. */
   DATE_STAMP_REGEX: /^\d{8}$/,
   amz(date: Date): string {
-    return `${date
-      .toISOString()
-      .slice(0, 19)
-      .replace(ANY_BUT_DIGITS_T, "")}Z`;
+    return `${
+      date
+        .toISOString()
+        .slice(0, 19)
+        .replace(ANY_BUT_DIGITS_T, "")
+    }Z`;
   },
   dateStamp(date: Date): string {
     return date
@@ -254,5 +256,5 @@ export const date: Doc = {
     } else {
       throw new Error(`unhandled timestamp format: ${value}`);
     }
-  }
+  },
 };
