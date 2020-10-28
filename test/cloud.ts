@@ -169,3 +169,33 @@ Deno.test({
 //     await dyno.listTables();
 //   }
 // });
+
+Deno.test({
+  name: "conditional put item op",
+  async fn(): Promise<void> {
+    const id: string = "remington";
+    const caliber: number = 223;
+
+    // succeeds
+    await dyno.putItem({ TableName: TABLE_NAME, Item: { id, caliber } });
+
+    let failed: boolean = false;
+    try {
+      // fails bc the id already exists
+      await dyno.putItem({
+        TableName: TABLE_NAME,
+        Item: { id, caliber: caliber - 1 },
+        ConditionExpression: "attribute_not_exists(id)",
+      });
+    } catch (err) {
+      failed = true;
+      assertEquals(err.message, "The conditional request failed");
+    } finally {
+      assert(failed);
+    }
+
+    const result = await dyno.getItem({ TableName: TABLE_NAME, Key: { id } });
+
+    assertEquals(result.Item.caliber, caliber); // still caliber 223
+  },
+});
