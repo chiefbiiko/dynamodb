@@ -22,23 +22,25 @@ const conf: ClientConfig = {
 
 const dyno: DynamoDBClient = createClient(conf);
 
-await dyno.createTable({
-  TableName: TABLE_NAME,
-  KeySchema: [{ KeyType: "HASH", AttributeName: "id" }],
-  AttributeDefinitions: [{ AttributeName: "id", AttributeType: "S" }],
-  ProvisionedThroughput: { ReadCapacityUnits: 10, WriteCapacityUnits: 10 },
-});
+let result: Doc = await dyno.listTables();
+
+if (!result.TableNames.includes(TABLE_NAME)) {
+  await dyno.createTable({
+    TableName: TABLE_NAME,
+    KeySchema: [{ KeyType: "HASH", AttributeName: "id" }],
+    AttributeDefinitions: [{ AttributeName: "id", AttributeType: "S" }],
+    ProvisionedThroughput: { ReadCapacityUnits: 10, WriteCapacityUnits: 10 },
+  });
+}
 
 Deno.test({
   name: "schema translation enabled by default",
   async fn(): Promise<void> {
     const id: string = "abc";
 
-    let result: Doc = await dyno.listTables();
-
     const friends: string[] = ["djb", "devil", "donkey kong"];
 
-    result = await dyno.putItem({
+    let result: Doc = await dyno.putItem({
       TableName: TABLE_NAME,
       Item: { id, friends },
     });
@@ -232,5 +234,35 @@ Deno.test({
     assert(Array.isArray(result.Items));
     assert(result.Items.length > 0);
     assert(!!result.LastEvaluatedKey);
+  },
+});
+
+Deno.test({
+  name: "conditional put item op",
+  async fn(): Promise<void> {
+    const id: string = "remington";
+    const caliber: number = 223;
+
+    // succeeds
+    await dyno.putItem({ TableName: TABLE_NAME, Item: { id, caliber } });
+
+    let failed: boolean = false;
+    try {
+      // fails bc the id already exists
+      await dyno.putItem({
+        TableName: TABLE_NAME,
+        Item: { id, caliber: caliber - 1 },
+        ConditionExpression: "attribute_not_exists(id)",
+      });
+    } catch (err) {
+      failed = true;
+      assertEquals(err.message, "The conditional request failed");
+    } finally {
+      assert(failed);
+    }
+
+    const result = await dyno.getItem({ TableName: TABLE_NAME, Key: { id } });
+
+    assertEquals(result.Item.caliber, caliber); // still caliber 223
   },
 });
