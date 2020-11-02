@@ -2,7 +2,7 @@ import { baseOp, deriveConfig } from "./client/mod.ts";
 import { Doc, camelCase } from "./util.ts";
 
 /** Convenience export. */
-export { Doc } from "./util.ts";
+export type { Doc } from "./util.ts";
 
 /** Generic representation of a DynamoDB client. */
 export interface DynamoDBClient {

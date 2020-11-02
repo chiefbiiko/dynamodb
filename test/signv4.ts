@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@v0.34.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.34.0/testing/asserts.ts";
 
 import { encode } from "../deps.ts";
 import { awsSignatureV4, kdf } from "../client/aws_signature_v4.ts";
