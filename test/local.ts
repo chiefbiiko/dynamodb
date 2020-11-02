@@ -2,7 +2,7 @@ import {
   assert,
   assertEquals,
   assertThrowsAsync,
-} from "https://deno.land/std@v0.34.0/testing/asserts.ts";
+} from "https://deno.land/std@0.34.0/testing/asserts.ts";
 
 import { ClientConfig, DynamoDBClient, createClient } from "../mod.ts";
 
@@ -243,12 +243,12 @@ Deno.test({
     const id: string = "remington";
     const caliber: number = 223;
 
-    // succeeds
     await dyno.putItem({ TableName: TABLE_NAME, Item: { id, caliber } });
 
     let failed: boolean = false;
+    
     try {
-      // fails bc the id already exists
+      // NOTE: fails bc the id already exists & we use a cond expr
       await dyno.putItem({
         TableName: TABLE_NAME,
         Item: { id, caliber: caliber - 1 },
