@@ -12,7 +12,7 @@ function deriveHostEndpoint(
   let endpoint: string;
 
   if (region === "local") {
-    host = "localhost";
+    host = Deno.env.get("DYNAMODB_HOST") || "localhost";
     endpoint = `http://${host}:${port || 8000}/`;
   } else {
     host = `dynamodb.${region}.amazonaws.com`;
