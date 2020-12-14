@@ -6,6 +6,8 @@ import {
 
 import { ClientConfig, DynamoDBClient, createClient } from "../mod.ts";
 
+import { deriveConfig } from "../client/derive_config.ts";
+
 import { Doc } from "../util.ts";
 
 const TABLE_NAME: string = "testing_table";
@@ -32,6 +34,26 @@ if (!result.TableNames.includes(TABLE_NAME)) {
     ProvisionedThroughput: { ReadCapacityUnits: 10, WriteCapacityUnits: 10 },
   });
 }
+
+Deno.test({
+  name: "sets specified dynamodb host",
+  async fn(): Promise<void> {
+    const _conf: ClientConfig = {
+      credentials: {
+        accessKeyId: "DynamoDBLocal",
+        secretAccessKey: "DoesNotDoAnyAuth",
+        sessionToken: "preferTemporaryCredentials",
+      },
+      region: "local",
+      port: 8000, // DynamoDB Local's default port
+      host: "host.docker.internal", // Specific DynamoDB host
+    };
+      
+    let result: Doc = deriveConfig(_conf);
+    
+    assertEquals(_conf.host, result.host);
+  },
+});
 
 Deno.test({
   name: "schema translation enabled by default",
