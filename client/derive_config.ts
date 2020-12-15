@@ -6,15 +6,14 @@ import { createCache } from "./create_cache.ts";
 /** Derives host and endpoint. */
 function deriveHostEndpoint(
   region: string,
-  port?: number,
-  host?: string
+  port = 8000,
+  host = "localhost"
 ): { host: string; endpoint: string } {
-  let _host: string;
+  let _host: string = host;
   let endpoint: string;
 
   if (region === "local") {
-    _host = host || "localhost";
-    endpoint = `http://${_host}:${port || 8000}/`;
+    endpoint = `http://${host}:${port}/`;
   } else {
     _host = `dynamodb.${region}.amazonaws.com`;
     endpoint = `https://${_host}:443/`;
