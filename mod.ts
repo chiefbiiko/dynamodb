@@ -34,6 +34,7 @@ export interface ClientConfig {
   profile?: string; // default
   canonicalUri?: string; // fx /path/to/somewhere
   port?: number; // 80
+  host?: string; // localhost
 }
 
 /** DynamoDB operations. */

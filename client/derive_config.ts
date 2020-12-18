@@ -6,20 +6,20 @@ import { createCache } from "./create_cache.ts";
 /** Derives host and endpoint. */
 function deriveHostEndpoint(
   region: string,
-  port: number,
+  port = 8000,
+  host = "localhost"
 ): { host: string; endpoint: string } {
-  let host: string;
+  let _host: string = host;
   let endpoint: string;
 
   if (region === "local") {
-    host = "localhost";
-    endpoint = `http://${host}:${port || 8000}/`;
+    endpoint = `http://${host}:${port}/`;
   } else {
-    host = `dynamodb.${region}.amazonaws.com`;
-    endpoint = `https://${host}:443/`;
+    _host = `dynamodb.${region}.amazonaws.com`;
+    endpoint = `https://${_host}:443/`;
   }
 
-  return { host, endpoint };
+  return { host: _host, endpoint };
 }
 
 /** Derives an internal config object from a ClientConfig. */
@@ -60,6 +60,6 @@ export function deriveConfig(conf: ClientConfig = {}): Doc {
     ..._conf,
     cache: createCache(_conf),
     method: "POST",
-    ...deriveHostEndpoint(_conf.region!, _conf.port!),
+    ...deriveHostEndpoint(_conf.region!, _conf.port!, _conf.host!),
   };
 }
