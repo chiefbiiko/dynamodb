@@ -42,7 +42,7 @@ export async function baseFetch(
       }
     }
 
-    throw new Error(body.message);
+    throw new Error(body.message || body.Message);
   }
 
   return body;
