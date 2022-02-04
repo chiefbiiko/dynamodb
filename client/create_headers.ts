@@ -10,14 +10,12 @@ const ALGORITHM: string = "AWS4-HMAC-SHA256";
 const CONTENT_TYPE: string = "application/x-amz-json-1.0";
 
 /** Required configuration for assembling headers. */
-interface HeadersConfig extends ClientConfig {
+export interface HeadersConfig extends ClientConfig {
   host: string; // dynamodb.us-west-2.amazonaws.com
   method: string; // POST
   cache: Doc; // internal cache for expensive-2-make signing key (& credScope)
   date?: Date; // allows reusing a date for 5min (max signature timestamp diff)
 }
-
-export type { HeadersConfig };
 
 /** Assembles a header object for a DynamoDB request. */
 export async function createHeaders(

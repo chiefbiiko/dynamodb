@@ -2,11 +2,9 @@ const ANY_BUT_DIGITS: RegExp = /[^\d]/g;
 const ANY_BUT_DIGITS_T: RegExp = /[^\dT]/g;
 
 /** Generic document. */
-interface Doc {
+export interface Doc {
   [key: string]: any;
 }
-
-export type { Doc };
 
 /** noop. */
 export function noop(..._: any[]): void {}
